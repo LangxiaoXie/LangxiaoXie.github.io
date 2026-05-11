@@ -8,8 +8,8 @@ const drawButton = document.getElementById('drawButton');
 const clearButton = document.getElementById('clearButton');
 
 // ── Constants ──────────────────────────────────────────────────────────────
-const CELL          = 20;    // grid cell size in CSS px
-const ENEMY_R       = 9;     // enemy half-size px (≈ one cell)
+const CELL          = 36;    // grid cell size in CSS px
+const ENEMY_R       = 16;    // enemy half-size px (≈ one cell)
 const ENEMY_SPEED   = 55;    // px/s
 const ENEMY_HP      = 3;
 const BULLET_SPEED  = 240;   // px/s
