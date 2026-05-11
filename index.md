@@ -10,8 +10,7 @@ layout: default
             <a>langxiao [dot] xie [at] berkeley [dot] edu</a>
             <a href="https://linkedin.com/in/lucas-x-019b67174">LinkedIn</a>
             <a href="https://github.com/LangxiaoXie">GitHub</a>
-            <a href="https://joneedssleep.github.io" style="margin-top:2rem;font-size:0.75rem;opacity:0.5;">site template by Jo J. Jiao</a>
-        </div>
+</div>
     </div>
     <div class="right-column">
         <p>
