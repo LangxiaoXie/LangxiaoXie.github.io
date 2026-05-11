@@ -14,17 +14,17 @@ layout: default
     </div>
     <div class="right-column">
         <p>
-            Hi there! I'm Luc. I believe the most important question one can ask is still regarding the good life, yet the question has been forgotten due to recent rapid changes in our society. As of spring 2026, I am an independent researcher working on AI safety, poverty, and energy. Outside of my research, I read great books, milk cows, and hire interesting professors at Deep Springs College.
-
-I am interested in the learning and generalization dynamics of machine learning models, especially as it pertains to (mis)alignment.
+            Hi there! I'm Luc. I believe the most important question one can ask is still regarding the good life.
         </p>
         <p>
-            xxx
+            As of spring 2026, I am an independent researcher working on poverty, energy, and AI safety. Outside of my research, I read great books, milk cows, and hire interesting professors at Deep Springs College.
         </p>
+        <p>
+I am interested in the intellectual and material formation of modernity, especially as they pertain to core–periphery relations, the project of Enlightenment, and the alignment problems posed by advanced AI systems.        </p>
         <details>
         <summary>More</summary>
         <p>
-            The thinkers, writers, and artists who have most shaped me are G.W.F. Hegel, Jacob Lurie, Hai Zi, and Mozart. For me, they represent structure, restraint, imagination, and rhythm.
+            The thinkers, writers, and artists who have most shaped me are Jacob Lurie, Zhuangzi, Plato, and Mozart. For me, they represent fortitude, temperance, prudence, and compassion
         </p>
         <p>
             Outside of work, I'm interested in intellectual history, language acquisition, and the backcountry.
