@@ -8,12 +8,12 @@ const drawButton = document.getElementById('drawButton');
 const clearButton = document.getElementById('clearButton');
 
 // ── Constants ──────────────────────────────────────────────────────────────
-const CELL          = 12;    // grid cell size in CSS px
-const ENEMY_R       = 4;     // enemy half-size px
+const CELL          = 20;    // grid cell size in CSS px
+const ENEMY_R       = 9;     // enemy half-size px (≈ one cell)
 const ENEMY_SPEED   = 55;    // px/s
 const ENEMY_HP      = 3;
-const BULLET_SPEED  = 220;   // px/s
-const TOWER_RANGE   = 140;   // px
+const BULLET_SPEED  = 240;   // px/s
+const TOWER_RANGE   = 180;   // px
 const TOWER_FIRE_CD = 0.9;   // seconds between shots per tower
 const SPAWN_CD      = 1.4;   // seconds between spawns
 const WAVE_BURST    = 3;     // enemies per spawn event
@@ -266,7 +266,7 @@ function update(dt) {
     for (let i = enemies.length - 1; i >= 0; i--) {
         moveEnemy(enemies[i], dt);
         const dx = enemies[i].x - targetX, dy = enemies[i].y - targetY;
-        if (dx * dx + dy * dy < ENEMY_R * ENEMY_R) {
+        if (dx * dx + dy * dy < CELL * CELL) {
             enemies.splice(i, 1);
             flashAlpha = 1.0;
         }
@@ -417,9 +417,9 @@ function drawFrame() {
         ctx.stroke();
     }
 
-    // Target — 1 red pixel
+    // Target — one block, red
     ctx.fillStyle = '#ff0000';
-    ctx.fillRect(targetX, targetY, 1, 1);
+    ctx.fillRect(targetX - CELL / 2, targetY - CELL / 2, CELL, CELL);
 }
 
 window.onload = initialize;
