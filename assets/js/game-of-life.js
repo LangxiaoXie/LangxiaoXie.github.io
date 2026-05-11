@@ -1,511 +1,434 @@
-// Conway's Game of Life Implementation
+// Tower Defense — background ambient game
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const interactionCanvas = document.getElementById('interactionCanvas');
-const interactionCtx = interactionCanvas.getContext('2d');
 const startButton = document.getElementById('startButton');
 const drawButton = document.getElementById('drawButton');
 const clearButton = document.getElementById('clearButton');
-const darkModeButton = document.getElementById('darkModeButton');
-const container = document.querySelector('.container');
 
-// Game state
-let isRunning = false;
-let isDrawMode = false;
-let isDragging = false;
-let isDarkMode = false;
-let grid = [];
-let cellSize = 20; // in CSS pixels
-let rows, cols;
-let lastCell = { row: -1, col: -1 };
+// ── Constants ──────────────────────────────────────────────────────────────
+const CELL          = 12;   // grid cell size in CSS px
+const ENEMY_R       = 3;    // enemy half-size px
+const ENEMY_SPEED   = 30;   // px/s
+const ENEMY_HP      = 4;
+const BULLET_SPEED  = 200;  // px/s
+const TOWER_RANGE   = 130;  // px
+const TOWER_FIRE_CD = 1.1;  // seconds between shots per tower
+const SPAWN_CD      = 2.0;  // seconds between enemy spawns
+
+// ── State ─────────────────────────────────────────────────────────────────
+let dpr = 1, cssW, cssH, cols, rows;
+let grid = [];          // 0=empty  1=wall  2=tower
+let enemies = [];       // {x, y, hp}
+let bullets = [];       // {x, y, vx, vy}
+let towerCD = {};       // "r,c" → seconds until next shot
+let isRunning   = false;
+let isDrawMode  = false;
+let gameOver    = false;
+let flashAlpha  = 0;    // red flash on target when breached
+let spawnTimer  = 0;
+let lastTime    = 0;
+let targetX, targetY;
+
+// pointer tracking
+let ptrCell    = null;  // cell where mousedown began
+let ptrDragged = false; // true once pointer crossed to a new cell
+let lastDragCell = { row: -1, col: -1 };
 let controlsRect = null;
-let dpr = 1;
 
-// Initialize
+// ── Boot ───────────────────────────────────────────────────────────────────
 function initialize() {
-    // Setup device pixel ratio aware canvases
-    dpr = window.devicePixelRatio || 1;
-    const cssWidth = window.innerWidth;
-    const cssHeight = window.innerHeight;
+    resize();
 
-    canvas.width = Math.round(cssWidth * dpr);
-    canvas.height = Math.round(cssHeight * dpr);
-    interactionCanvas.width = Math.round(cssWidth * dpr);
-    interactionCanvas.height = Math.round(cssHeight * dpr);
-    // Scale drawing context so coordinates remain in CSS pixels
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    interactionCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    
-    // Calculate rows and columns in CSS pixels
-    rows = Math.ceil(cssHeight / cellSize);
-    cols = Math.ceil(cssWidth / cellSize);
-    
-    // Create empty grid
-    grid = Array(rows).fill().map(() => Array(cols).fill(0));
-    
-    // Draw the empty grid
-    draw();
-    
-    // Get the position of the controls for click detection
-    updateControlsPosition();
-    
-    // Add event listeners
     startButton.addEventListener('click', toggleGame);
     drawButton.addEventListener('click', toggleDrawMode);
-    drawButton.addEventListener('touchstart', function(e) {
-        e.preventDefault(); // Prevent default touch behavior
-        toggleDrawMode();
+    clearButton.addEventListener('click', clearAll);
+
+    // Redraw on theme toggle so colors update immediately
+    document.getElementById('darkModeButton')?.addEventListener('click', () => {
+        setTimeout(drawFrame, 50);
     });
-    clearButton.addEventListener('click', clearGrid);
-    darkModeButton.addEventListener('click', toggleDarkMode);
-    
-    // Keyboard shortcut to exit draw mode (Escape key)
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && isDrawMode) {
-            toggleDrawMode();
-        }
+
+    interactionCanvas.addEventListener('mousedown',  onDown);
+    interactionCanvas.addEventListener('mousemove',  onMove);
+    interactionCanvas.addEventListener('mouseup',    onUp);
+    interactionCanvas.addEventListener('mouseleave', onUp);
+    interactionCanvas.addEventListener('contextmenu', e => { e.preventDefault(); });
+
+    interactionCanvas.addEventListener('touchstart',  onDown, { passive: false });
+    interactionCanvas.addEventListener('touchmove',   onMove, { passive: false });
+    interactionCanvas.addEventListener('touchend',    onUp);
+    interactionCanvas.addEventListener('touchcancel', onUp);
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && isDrawMode) toggleDrawMode();
     });
-    
-    // Mouse/Touchpad events - attach to interaction canvas
-    interactionCanvas.addEventListener('mousedown', handlePointerStart);
-    interactionCanvas.addEventListener('mousemove', handlePointerMove);
-    interactionCanvas.addEventListener('mouseup', handlePointerEnd);
-    interactionCanvas.addEventListener('mouseleave', handlePointerEnd);
-    interactionCanvas.addEventListener('dblclick', handleCanvasDoubleClick);
-    
-    // Touch events - attach to interaction canvas
-    interactionCanvas.addEventListener('touchstart', handlePointerStart);
-    interactionCanvas.addEventListener('touchmove', handlePointerMove);
-    interactionCanvas.addEventListener('touchend', handlePointerEnd);
-    interactionCanvas.addEventListener('touchcancel', handlePointerEnd);
-    
-    window.addEventListener('resize', () => {
-        resizeCanvas();
-        updateControlsPosition();
-    });
-    window.addEventListener('scroll', () => {
-        // keep control hitboxes accurate when page scrolls
-        updateControlsPosition();
-    }, { passive: true });
-    
-    // Dynamically allow clicks through overlay for controls (desktop)
-    window.addEventListener('mousemove', handleGlobalPointerHover, { passive: true });
-    window.addEventListener('touchmove', handleGlobalPointerHover, { passive: true });
-    
-    // Add click handler for the interaction canvas
-    interactionCanvas.addEventListener('click', checkForControlsClick);
-    interactionCanvas.addEventListener('touchstart', checkForControlsClick);
-    
-    // Check for saved dark mode preference
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-    if (savedDarkMode) {
-        toggleDarkMode();
+
+    window.addEventListener('resize', () => { resize(); updateControlsRect(); });
+    window.addEventListener('scroll', updateControlsRect, { passive: true });
+    window.addEventListener('mousemove', handleHoverOverControls, { passive: true });
+
+    updateControlsRect();
+    drawFrame();
+}
+
+function resize() {
+    dpr  = window.devicePixelRatio || 1;
+    cssW = window.innerWidth;
+    cssH = window.innerHeight;
+
+    for (const cv of [canvas, interactionCanvas]) {
+        cv.width  = Math.round(cssW * dpr);
+        cv.height = Math.round(cssH * dpr);
+        cv.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
     }
-}
 
-// Update the position of the game controls for click detection
-function updateControlsPosition() {
-    const gameControls = document.querySelector('.game-controls');
-    controlsRect = gameControls.getBoundingClientRect();
-}
-
-// Check if a click on the canvas should be treated as a click on the controls
-function checkForControlsClick(e) {
-    if (!isDrawMode) return;
-    
-    const point = getClientPoint(e);
-    const { x, y } = point;
-    
-    if (!controlsRect) return;
-    
-    // If the user tapped inside the draw button, exit draw mode
-    const drawButtonRect = drawButton.getBoundingClientRect();
-    if (x >= drawButtonRect.left && x <= drawButtonRect.right &&
-        y >= drawButtonRect.top && y <= drawButtonRect.bottom) {
-        toggleDrawMode();
-        e.stopPropagation();
-        return;
-    }
-}
-
-// Toggle overlay pointer events when hovering over controls (desktop friendliness)
-function handleGlobalPointerHover(e) {
-    if (!isDrawMode || !controlsRect) return;
-    const point = getClientPoint(e);
-    const { x, y } = point;
-    const padding = 8;
-    const overControls = (
-        x >= controlsRect.left - padding &&
-        x <= controlsRect.right + padding &&
-        y >= controlsRect.top - padding &&
-        y <= controlsRect.bottom + padding
+    const newCols = Math.ceil(cssW / CELL);
+    const newRows = Math.ceil(cssH / CELL);
+    const old = grid;
+    grid = Array.from({ length: newRows }, (_, r) =>
+        Array.from({ length: newCols }, (_, c) => (old[r] && old[r][c]) || 0)
     );
-    if (overControls) {
-        interactionCanvas.style.pointerEvents = 'none';
-    } else {
-        interactionCanvas.style.pointerEvents = isDrawMode ? 'auto' : 'none';
-    }
+    cols = newCols;
+    rows = newRows;
+
+    targetX = Math.round(cssW / 2);
+    targetY = Math.round(cssH / 2);
+
+    drawFrame();
 }
 
-// Clear the grid
-function clearGrid() {
-    // Stop the game if it's running
-    if (isRunning) {
-        toggleGame();
+function updateControlsRect() {
+    const el = document.querySelector('.game-controls');
+    if (el) controlsRect = el.getBoundingClientRect();
+}
+
+function handleHoverOverControls(e) {
+    if (!isDrawMode || !controlsRect) return;
+    const pad = 8;
+    const over = e.clientX >= controlsRect.left - pad && e.clientX <= controlsRect.right  + pad &&
+                 e.clientY >= controlsRect.top  - pad && e.clientY <= controlsRect.bottom + pad;
+    interactionCanvas.style.pointerEvents = over ? 'none' : 'auto';
+}
+
+// ── Input helpers ──────────────────────────────────────────────────────────
+function getPoint(e) {
+    const t = e.touches;
+    return t && t.length ? { x: t[0].clientX, y: t[0].clientY } : { x: e.clientX, y: e.clientY };
+}
+
+function cellAt(e) {
+    const { x, y } = getPoint(e);
+    const r = interactionCanvas.getBoundingClientRect();
+    return { col: Math.floor((x - r.left) / CELL), row: Math.floor((y - r.top) / CELL) };
+}
+
+function inGrid(r, c) { return r >= 0 && r < rows && c >= 0 && c < cols; }
+
+function inControls(pt) {
+    if (!controlsRect) return false;
+    return pt.x >= controlsRect.left && pt.x <= controlsRect.right &&
+           pt.y >= controlsRect.top  && pt.y <= controlsRect.bottom;
+}
+
+// ── Pointer events ─────────────────────────────────────────────────────────
+function onDown(e) {
+    if (!isDrawMode) return;
+    e.preventDefault();
+    const pt = getPoint(e);
+    if (inControls(pt)) return;
+    const cell = cellAt(e);
+    if (!inGrid(cell.row, cell.col)) return;
+    ptrCell    = cell;
+    ptrDragged = false;
+    lastDragCell = { ...cell };
+}
+
+function onMove(e) {
+    if (!isDrawMode || !ptrCell) return;
+    e.preventDefault();
+    const pt = getPoint(e);
+    if (inControls(pt)) return;
+    const cell = cellAt(e);
+    if (!inGrid(cell.row, cell.col)) return;
+    if (cell.row === lastDragCell.row && cell.col === lastDragCell.col) return;
+
+    if (!ptrDragged) {
+        // First move: paint starting cell as wall too
+        setCell(ptrCell.row, ptrCell.col, 1);
+        ptrDragged = true;
     }
-    
-    // Reset all cells to 0
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-            grid[i][j] = 0;
+    // Interpolate walls
+    bresenham(lastDragCell, cell, (r, c) => setCell(r, c, 1));
+    lastDragCell = { ...cell };
+    drawFrame();
+}
+
+function onUp(e) {
+    if (!isDrawMode || !ptrCell) { ptrCell = null; return; }
+    if (!ptrDragged) {
+        // Single click → cycle: empty→wall→tower→empty
+        const { row, col } = ptrCell;
+        if (inGrid(row, col)) {
+            setCell(row, col, (grid[row][col] + 1) % 3);
+            drawFrame();
         }
     }
-    
-    // Update the display
-    draw();
+    ptrCell    = null;
+    ptrDragged = false;
+    lastDragCell = { row: -1, col: -1 };
 }
 
-// Toggle game state
+function setCell(r, c, val) {
+    if (!inGrid(r, c)) return;
+    grid[r][c] = val;
+    if (val !== 2) delete towerCD[`${r},${c}`];
+}
+
+function bresenham(from, to, fn) {
+    let { row: r0, col: c0 } = from;
+    const { row: r1, col: c1 } = to;
+    const dr = Math.abs(r1 - r0), dc = Math.abs(c1 - c0);
+    const sr = r0 < r1 ? 1 : -1, sc = c0 < c1 ? 1 : -1;
+    let err = dc - dr;
+    while (true) {
+        fn(r0, c0);
+        if (r0 === r1 && c0 === c1) break;
+        const e2 = 2 * err;
+        if (e2 > -dr) { err -= dr; c0 += sc; }
+        if (e2 <  dc) { err += dc; r0 += sr; }
+    }
+}
+
+// ── Game control ───────────────────────────────────────────────────────────
 function toggleGame() {
+    if (gameOver) {
+        gameOver   = false;
+        enemies    = [];
+        bullets    = [];
+        spawnTimer = 0;
+        flashAlpha = 0;
+    }
     isRunning = !isRunning;
-    if(isRunning) {
+    if (isRunning) {
         startButton.textContent = 'Pause';
         startButton.classList.add('active');
-        if(isEmpty()) {
-            if (Math.random() < 1 / 7) {
-                addGliderGun();
-            } else {
-                addRandomPattern();
-            }
-        }
-        gameLoop();
+        if (isDrawMode) toggleDrawMode();
+        lastTime = performance.now();
+        requestAnimationFrame(loop);
     } else {
-        startButton.textContent = 'Start Game of Life';
+        startButton.textContent = 'Initiate Attack';
         startButton.classList.remove('active');
     }
 }
 
-// Toggle draw mode
 function toggleDrawMode() {
     isDrawMode = !isDrawMode;
-    if(isDrawMode) {
+    if (isDrawMode) {
         drawButton.textContent = 'Exit Draw Mode';
         drawButton.classList.add('active');
         interactionCanvas.classList.add('draw-mode');
-        document.querySelector('.game-controls').style.pointerEvents = 'auto';
-        if(isRunning) toggleGame(); // Pause if running
-        
-        // Add a visual cue about using Escape key
-        const escapeText = document.createElement('div');
-        escapeText.id = 'escape-hint';
-        escapeText.textContent = 'Press ESC to exit draw mode';
-        escapeText.style.position = 'fixed';
-        escapeText.style.bottom = '10px';
-        escapeText.style.left = '50%';
-        escapeText.style.transform = 'translateX(-50%)';
-        escapeText.style.background = 'rgba(0,0,0,0.7)';
-        escapeText.style.color = 'white';
-        escapeText.style.padding = '5px 10px';
-        escapeText.style.borderRadius = '4px';
-        escapeText.style.zIndex = '102';
-        document.body.appendChild(escapeText);
+        if (isRunning) toggleGame();
     } else {
         drawButton.textContent = 'Draw Mode';
         drawButton.classList.remove('active');
         interactionCanvas.classList.remove('draw-mode');
         interactionCanvas.style.pointerEvents = 'none';
-        
-        // Remove the escape hint if it exists
-        const hint = document.getElementById('escape-hint');
-        if (hint) {
-            document.body.removeChild(hint);
+    }
+}
+
+function clearAll() {
+    if (isRunning) toggleGame();
+    grid      = Array.from({ length: rows }, () => Array(cols).fill(0));
+    enemies   = [];
+    bullets   = [];
+    towerCD   = {};
+    gameOver  = false;
+    flashAlpha = 0;
+    spawnTimer = 0;
+    drawFrame();
+}
+
+// ── Game loop ──────────────────────────────────────────────────────────────
+function loop(ts) {
+    if (!isRunning) return;
+    const dt = Math.min((ts - lastTime) / 1000, 0.1);
+    lastTime = ts;
+    update(dt);
+    drawFrame();
+    requestAnimationFrame(loop);
+}
+
+function update(dt) {
+    // Spawn
+    spawnTimer += dt;
+    if (spawnTimer >= SPAWN_CD) { spawnTimer = 0; spawnEnemy(); }
+
+    // Move enemies
+    for (let i = enemies.length - 1; i >= 0; i--) {
+        moveEnemy(enemies[i], dt);
+        const dx = enemies[i].x - targetX, dy = enemies[i].y - targetY;
+        if (dx * dx + dy * dy < 9) {
+            // Reached target
+            enemies.splice(i, 1);
+            flashAlpha = 1.0;
         }
     }
-}
 
-// Check if grid is empty
-function isEmpty() {
-    return grid.every(row => row.every(cell => cell === 0));
-}
-
-// Add random pattern
-function addRandomPattern() {
-    // Random seed with 25% chance of alive cells
-    for(let i = 0; i < rows; i++) {
-        for(let j = 0; j < cols; j++) {
-            grid[i][j] = Math.random() > 0.75 ? 1 : 0;
-        }
-    }
-}
-
-// Add Gosper Glider Gun pattern centered on the grid
-function addGliderGun() {
-    // Gosper Glider Gun cell offsets (row, col) relative to top-left of pattern
-    const gun = [
-        [0,24],
-        [1,22],[1,24],
-        [2,12],[2,13],[2,20],[2,21],[2,34],[2,35],
-        [3,11],[3,15],[3,20],[3,21],[3,34],[3,35],
-        [4,0],[4,1],[4,10],[4,16],[4,20],[4,21],
-        [5,0],[5,1],[5,10],[5,14],[5,16],[5,17],[5,22],[5,24],
-        [6,10],[6,16],[6,24],
-        [7,11],[7,15],
-        [8,12],[8,13]
-    ];
-
-    const gunRows = 9;
-    const gunCols = 36;
-
-    // Don't place if grid is too small
-    if (rows < gunRows || cols < gunCols) {
-        addRandomPattern();
-        return;
-    }
-
-    // Center the pattern on the grid
-    const offsetR = Math.floor((rows - gunRows) / 2);
-    const offsetC = Math.floor((cols - gunCols) / 2);
-
-    for (const [r, c] of gun) {
-        grid[offsetR + r][offsetC + c] = 1;
-    }
-}
-
-// Get coordinates from mouse or touch event
-function getCoordinates(e) {
-    const rect = interactionCanvas.getBoundingClientRect();
-    const point = getClientPoint(e);
-    const x = point.x - rect.left;
-    const y = point.y - rect.top;
-    const col = Math.floor(x / cellSize);
-    const row = Math.floor(y / cellSize);
-    return { row, col };
-}
-
-function getClientPoint(e) {
-    if (e.touches && e.touches.length) {
-        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    }
-    return { x: e.clientX, y: e.clientY };
-}
-
-// Handle pointer start (mouse down or touch start)
-function handlePointerStart(e) {
-    if (!isDrawMode) return;
-    
-    e.preventDefault(); // Prevent scrolling on touch devices
-    isDragging = true;
-    
-    // Avoid drawing when starting inside controls
-    const pt = getClientPoint(e);
-    if (controlsRect && pt.x >= controlsRect.left && pt.x <= controlsRect.right && pt.y >= controlsRect.top && pt.y <= controlsRect.bottom) {
-        return;
-    }
-    
-    const { row, col } = getCoordinates(e);
-    if (row >= 0 && row < rows && col >= 0 && col < cols) {
-        grid[row][col] = 1;
-        lastCell = { row, col };
-        draw();
-    }
-}
-
-// Handle pointer move (mouse move or touch move)
-function handlePointerMove(e) {
-    if (!isDrawMode || !isDragging) return;
-    
-    e.preventDefault(); // Prevent scrolling on touch devices
-    
-    const { row, col } = getCoordinates(e);
-    
-    // Only draw if it's a valid position and different from the last cell
-    if (row >= 0 && row < rows && col >= 0 && col < cols &&
-        (row !== lastCell.row || col !== lastCell.col)) {
-        grid[row][col] = 1;
-        
-        // Interpolate between last cell and current cell for smooth drawing
-        interpolateCells(lastCell, { row, col });
-        lastCell = { row, col };
-        draw();
-    }
-}
-
-// Interpolate cells between two points for smooth drawing
-function interpolateCells(from, to) {
-    // Simple Bresenham's line algorithm
-    const dx = Math.abs(to.col - from.col);
-    const dy = Math.abs(to.row - from.row);
-    const sx = from.col < to.col ? 1 : -1;
-    const sy = from.row < to.row ? 1 : -1;
-    let err = dx - dy;
-    
-    let currentRow = from.row;
-    let currentCol = from.col;
-    
-    while(true) {
-        if (currentRow >= 0 && currentRow < rows && currentCol >= 0 && currentCol < cols) {
-            grid[currentRow][currentCol] = 1;
-        }
-        
-        if (currentRow === to.row && currentCol === to.col) break;
-        
-        const e2 = 2 * err;
-        if (e2 > -dy) {
-            err -= dy;
-            currentCol += sx;
-        }
-        if (e2 < dx) {
-            err += dx;
-            currentRow += sy;
-        }
-    }
-}
-
-// Handle pointer end (mouse up or touch end)
-function handlePointerEnd() {
-    isDragging = false;
-    lastCell = { row: -1, col: -1 }; // Reset last cell
-}
-
-// Handle double click (remove cell)
-function handleCanvasDoubleClick(e) {
-    if(!isDrawMode) return;
-    
-    const { row, col } = getCoordinates(e);
-    
-    if(row >= 0 && row < rows && col >= 0 && col < cols) {
-        grid[row][col] = 0;
-        draw();
-    }
-}
-
-// Resize canvas
-function resizeCanvas() {
-    const oldGrid = [...grid];
-    dpr = window.devicePixelRatio || 1;
-    const cssWidth = window.innerWidth;
-    const cssHeight = window.innerHeight;
-    canvas.width = Math.round(cssWidth * dpr);
-    canvas.height = Math.round(cssHeight * dpr);
-    interactionCanvas.width = Math.round(cssWidth * dpr);
-    interactionCanvas.height = Math.round(cssHeight * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    interactionCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    
-    const oldRows = rows;
-    const oldCols = cols;
-    
-    rows = Math.ceil(cssHeight / cellSize);
-    cols = Math.ceil(cssWidth / cellSize);
-    
-    // Create new grid
-    grid = Array(rows).fill().map(() => Array(cols).fill(0));
-    
-    // Copy old grid data
-    for(let i = 0; i < Math.min(rows, oldRows); i++) {
-        for(let j = 0; j < Math.min(cols, oldCols); j++) {
-            grid[i][j] = oldGrid[i][j];
-        }
-    }
-    
-    draw();
-}
-
-// Game loop
-function gameLoop() {
-    if(!isRunning) return;
-    
-    update();
-    draw();
-    
-    setTimeout(() => {
-        requestAnimationFrame(gameLoop);
-    }, 150); // Speed of the game - adjust as needed
-}
-
-// Update game state
-function update() {
-    const newGrid = Array(rows).fill().map(() => Array(cols).fill(0));
-    
-    for(let i = 0; i < rows; i++) {
-        for(let j = 0; j < cols; j++) {
-            const neighbors = countNeighbors(i, j);
-            
-            if(grid[i][j] === 1) {
-                // Cell is alive
-                if(neighbors < 2 || neighbors > 3) {
-                    newGrid[i][j] = 0; // Dies
-                } else {
-                    newGrid[i][j] = 1; // Stays alive
-                }
-            } else {
-                // Cell is dead
-                if(neighbors === 3) {
-                    newGrid[i][j] = 1; // Becomes alive
+    // Towers fire
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            if (grid[r][c] !== 2) continue;
+            const key = `${r},${c}`;
+            towerCD[key] = (towerCD[key] ?? TOWER_FIRE_CD) - dt;
+            if (towerCD[key] <= 0) {
+                towerCD[key] = TOWER_FIRE_CD;
+                const tx = c * CELL + CELL / 2, ty = r * CELL + CELL / 2;
+                const en = nearestEnemy(tx, ty);
+                if (en) {
+                    const dx = en.x - tx, dy = en.y - ty;
+                    const d = Math.sqrt(dx * dx + dy * dy);
+                    bullets.push({ x: tx, y: ty, vx: dx / d * BULLET_SPEED, vy: dy / d * BULLET_SPEED });
                 }
             }
         }
     }
-    
-    grid = newGrid;
-}
 
-// Count neighbors
-function countNeighbors(row, col) {
-    let count = 0;
-    
-    for(let i = -1; i <= 1; i++) {
-        for(let j = -1; j <= 1; j++) {
-            if(i === 0 && j === 0) continue;
-            
-            const r = (row + i + rows) % rows; // Wrap around
-            const c = (col + j + cols) % cols; // Wrap around
-            
-            count += grid[r][c];
+    // Move bullets + hit detection
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        const b = bullets[i];
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        if (b.x < -10 || b.x > cssW + 10 || b.y < -10 || b.y > cssH + 10) {
+            bullets.splice(i, 1); continue;
         }
+        let hit = false;
+        for (let j = enemies.length - 1; j >= 0; j--) {
+            const en = enemies[j];
+            const dx = b.x - en.x, dy = b.y - en.y;
+            if (dx * dx + dy * dy < (ENEMY_R + 1) * (ENEMY_R + 1)) {
+                if (--en.hp <= 0) enemies.splice(j, 1);
+                hit = true; break;
+            }
+        }
+        if (hit) bullets.splice(i, 1);
     }
-    
-    return count;
+
+    // Decay flash
+    if (flashAlpha > 0) flashAlpha = Math.max(0, flashAlpha - dt * 2);
 }
 
-// Draw the grid
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Get computed color from CSS variables
-    const cellColor = getComputedStyle(document.documentElement).getPropertyValue('--cell-color').trim();
-    ctx.fillStyle = cellColor;
-    
-    for(let i = 0; i < rows; i++) {
-        for(let j = 0; j < cols; j++) {
-            if(grid[i][j] === 1) {
-                ctx.fillRect(j * cellSize, i * cellSize, cellSize - 1, cellSize - 1);
+function spawnEnemy() {
+    let x, y;
+    const edge = Math.floor(Math.random() * 4);
+    if      (edge === 0) { x = Math.random() * cssW; y = -ENEMY_R * 2; }
+    else if (edge === 1) { x = cssW + ENEMY_R * 2; y = Math.random() * cssH; }
+    else if (edge === 2) { x = Math.random() * cssW; y = cssH + ENEMY_R * 2; }
+    else                 { x = -ENEMY_R * 2;         y = Math.random() * cssH; }
+    enemies.push({ x, y, hp: ENEMY_HP });
+}
+
+function moveEnemy(en, dt) {
+    const dx = targetX - en.x, dy = targetY - en.y;
+    const d  = Math.sqrt(dx * dx + dy * dy);
+    if (d < 1) return;
+    const nx = dx / d, ny = dy / d;
+    const step = ENEMY_SPEED * dt;
+
+    let newX = en.x + nx * step;
+    let newY = en.y + ny * step;
+
+    // Wall collision — try to slide
+    const nc = Math.floor(newX / CELL), nr = Math.floor(newY / CELL);
+    if (inGrid(nr, nc) && grid[nr][nc] === 1) {
+        // try slide x only
+        const nrX = Math.floor(en.y / CELL), ncX = Math.floor(newX / CELL);
+        // try slide y only
+        const nrY = Math.floor(newY / CELL), ncY = Math.floor(en.x / CELL);
+        const slideX = inGrid(nrX, ncX) && grid[nrX][ncX] !== 1;
+        const slideY = inGrid(nrY, ncY) && grid[nrY][ncY] !== 1;
+        if (slideX && !slideY)       { newY = en.y; }
+        else if (slideY && !slideX)  { newX = en.x; }
+        else if (slideX && slideY)   { newY = en.y; } // prefer sliding x
+        else {
+            // fully blocked — nudge perpendicularly
+            newX = en.x + ny * step;
+            newY = en.y - nx * step;
+            const nr2 = Math.floor(newY / CELL), nc2 = Math.floor(newX / CELL);
+            if (inGrid(nr2, nc2) && grid[nr2][nc2] === 1) {
+                newX = en.x; newY = en.y; // give up this frame
             }
         }
     }
+
+    en.x = newX;
+    en.y = newY;
 }
 
-// Toggle dark mode
-function toggleDarkMode() {
-    isDarkMode = !isDarkMode;
-    
-    if(isDarkMode) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        darkModeButton.setAttribute('aria-label', 'Toggle light mode');
-        darkModeButton.classList.add('active');
-    } else {
-        document.documentElement.removeAttribute('data-theme');
-        darkModeButton.setAttribute('aria-label', 'Toggle dark mode');
-        darkModeButton.classList.remove('active');
+function nearestEnemy(tx, ty) {
+    let best = null, bestD2 = TOWER_RANGE * TOWER_RANGE;
+    for (const en of enemies) {
+        const dx = en.x - tx, dy = en.y - ty;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < bestD2) { bestD2 = d2; best = en; }
     }
-    
-    // Save preference
-    localStorage.setItem('darkMode', isDarkMode);
-    
-    // Redraw game
-    draw();
+    return best;
 }
 
-// Start when the page loads
-window.onload = initialize; 
+// ── Draw ───────────────────────────────────────────────────────────────────
+function drawFrame() {
+    ctx.clearRect(0, 0, cssW, cssH);
+
+    const dark       = document.documentElement.getAttribute('data-theme') === 'dark';
+    const wallColor  = dark ? '#555' : '#d0d0d0';
+    const towerColor = '#ffce6b';
+    const innerColor = dark ? '#333' : '#b0b0b0';
+    const enemyColor = dark ? '#999' : '#777';
+
+    // Walls & towers
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            const v = grid[r][c];
+            if (v === 1) {
+                ctx.fillStyle = wallColor;
+                ctx.fillRect(c * CELL, r * CELL, CELL - 1, CELL - 1);
+            } else if (v === 2) {
+                ctx.fillStyle = towerColor;
+                ctx.fillRect(c * CELL, r * CELL, CELL - 1, CELL - 1);
+                ctx.fillStyle = innerColor;
+                ctx.fillRect(c * CELL + 3, r * CELL + 3, CELL - 7, CELL - 7);
+            }
+        }
+    }
+
+    // Enemies
+    for (const en of enemies) {
+        const t = en.hp / ENEMY_HP;
+        ctx.fillStyle = enemyColor;
+        ctx.globalAlpha = 0.4 + 0.6 * t;
+        ctx.fillRect(en.x - ENEMY_R, en.y - ENEMY_R, ENEMY_R * 2, ENEMY_R * 2);
+    }
+    ctx.globalAlpha = 1;
+
+    // Bullets
+    ctx.fillStyle = '#ffce6b';
+    for (const b of bullets) {
+        ctx.fillRect(b.x - 1, b.y - 1, 2, 2);
+    }
+
+    // Flash ring when target is hit
+    if (flashAlpha > 0) {
+        ctx.strokeStyle = `rgba(255, 0, 0, ${flashAlpha})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(targetX, targetY, 6 + (1 - flashAlpha) * 10, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+
+    // Target — 1 red pixel
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(targetX, targetY, 1, 1);
+}
+
+window.onload = initialize;

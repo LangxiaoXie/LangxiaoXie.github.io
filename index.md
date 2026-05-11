@@ -29,7 +29,7 @@ layout: default
         </p>
         </details>
         <div class="game-controls">
-            <button id="startButton">Start Game of Life</button>
+            <button id="startButton">Initiate Attack</button>
             <button id="drawButton">Draw Mode</button>
             <button id="clearButton">Clear</button>
         </div>
