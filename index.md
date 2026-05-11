@@ -14,18 +14,20 @@ layout: default
     </div>
     <div class="right-column">
         <p>
-            Hi, I'm Luc — a student at UC Berkeley interested in quantitative finance, language learning, and building tools that are actually useful.
+            Hi there! I'm Luc. I believe the most important question one can ask is still regarding the good life, yet the question has been forgotten due to recent rapid changes in our society. As of spring 2026, I am an independent researcher working on AI safety, poverty, and energy. Outside of my research, I read great books, milk cows, and hire interesting professors at Deep Springs College.
+
+I am interested in the learning and generalization dynamics of machine learning models, especially as it pertains to (mis)alignment.
         </p>
         <p>
-            I like systems that are elegant under the hood: a well-reasoned trade signal, a vocabulary app that respects your time, a website that loads fast. Most of what I build starts as something I wanted for myself.
+            xxx
         </p>
         <details>
         <summary>More</summary>
         <p>
-            I'm drawn to problems at the intersection of data and decision-making — whether that's allocating capital across sectors or figuring out the most efficient path from A1 to B2 in a foreign language.
+            The thinkers, writers, and artists who have most shaped me are G.W.F. Hegel, Jacob Lurie, Hai Zi, and Mozart. For me, they represent structure, restraint, imagination, and rhythm.
         </p>
         <p>
-            Outside of work, I'm interested in Chinese history, classical languages, and the occasional endurance sport.
+            Outside of work, I'm interested in intellectual history, language acquisition, and the backcountry.
         </p>
         </details>
         <div class="game-controls">
