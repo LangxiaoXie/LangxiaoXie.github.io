@@ -7,7 +7,7 @@ layout: default
         <h1 class="name">Luc Xie</h1>
         <button id="darkModeButton" class="theme-toggle" aria-label="Toggle dark mode"></button>
         <div class="social-links">
-            <a>langxiao.xie [at] berkeley [dot] edu</a>
+            <a>langxiao [dot] xie [at] berkeley [dot] edu</a>
             <a href="https://linkedin.com/in/lucas-x-019b67174">LinkedIn</a>
             <a href="https://github.com/LangxiaoXie">GitHub</a>
         </div>
