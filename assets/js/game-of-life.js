@@ -8,32 +8,32 @@ const drawButton = document.getElementById('drawButton');
 const clearButton = document.getElementById('clearButton');
 
 // ── Constants ──────────────────────────────────────────────────────────────
-const CELL          = 12;   // grid cell size in CSS px
-const ENEMY_R       = 3;    // enemy half-size px
-const ENEMY_SPEED   = 30;   // px/s
-const ENEMY_HP      = 4;
-const BULLET_SPEED  = 200;  // px/s
-const TOWER_RANGE   = 130;  // px
-const TOWER_FIRE_CD = 1.1;  // seconds between shots per tower
-const SPAWN_CD      = 2.0;  // seconds between enemy spawns
+const CELL          = 12;    // grid cell size in CSS px
+const ENEMY_R       = 4;     // enemy half-size px
+const ENEMY_SPEED   = 55;    // px/s
+const ENEMY_HP      = 3;
+const BULLET_SPEED  = 220;   // px/s
+const TOWER_RANGE   = 140;   // px
+const TOWER_FIRE_CD = 0.9;   // seconds between shots per tower
+const SPAWN_CD      = 1.4;   // seconds between spawns
+const WAVE_BURST    = 3;     // enemies per spawn event
 
 // ── State ─────────────────────────────────────────────────────────────────
 let dpr = 1, cssW, cssH, cols, rows;
-let grid = [];          // 0=empty  1=wall  2=tower
-let enemies = [];       // {x, y, hp}
-let bullets = [];       // {x, y, vx, vy}
-let towerCD = {};       // "r,c" → seconds until next shot
+let grid = [];       // 0=empty  1=wall  2=tower
+let enemies = [];    // {x, y, hp}
+let bullets = [];    // {x, y, vx, vy}
+let towerCD = {};    // "r,c" → seconds until next shot
 let isRunning   = false;
 let isDrawMode  = false;
-let gameOver    = false;
-let flashAlpha  = 0;    // red flash on target when breached
+let flashAlpha  = 0;
 let spawnTimer  = 0;
 let lastTime    = 0;
 let targetX, targetY;
 
 // pointer tracking
-let ptrCell    = null;  // cell where mousedown began
-let ptrDragged = false; // true once pointer crossed to a new cell
+let ptrCell      = null;
+let ptrDragged   = false;
 let lastDragCell = { row: -1, col: -1 };
 let controlsRect = null;
 
@@ -45,7 +45,6 @@ function initialize() {
     drawButton.addEventListener('click', toggleDrawMode);
     clearButton.addEventListener('click', clearAll);
 
-    // Redraw on theme toggle so colors update immediately
     document.getElementById('darkModeButton')?.addEventListener('click', () => {
         setTimeout(drawFrame, 50);
     });
@@ -54,7 +53,7 @@ function initialize() {
     interactionCanvas.addEventListener('mousemove',  onMove);
     interactionCanvas.addEventListener('mouseup',    onUp);
     interactionCanvas.addEventListener('mouseleave', onUp);
-    interactionCanvas.addEventListener('contextmenu', e => { e.preventDefault(); });
+    interactionCanvas.addEventListener('contextmenu', e => e.preventDefault());
 
     interactionCanvas.addEventListener('touchstart',  onDown, { passive: false });
     interactionCanvas.addEventListener('touchmove',   onMove, { passive: false });
@@ -140,8 +139,8 @@ function onDown(e) {
     if (inControls(pt)) return;
     const cell = cellAt(e);
     if (!inGrid(cell.row, cell.col)) return;
-    ptrCell    = cell;
-    ptrDragged = false;
+    ptrCell      = cell;
+    ptrDragged   = false;
     lastDragCell = { ...cell };
 }
 
@@ -155,20 +154,18 @@ function onMove(e) {
     if (cell.row === lastDragCell.row && cell.col === lastDragCell.col) return;
 
     if (!ptrDragged) {
-        // First move: paint starting cell as wall too
         setCell(ptrCell.row, ptrCell.col, 1);
         ptrDragged = true;
     }
-    // Interpolate walls
     bresenham(lastDragCell, cell, (r, c) => setCell(r, c, 1));
     lastDragCell = { ...cell };
     drawFrame();
 }
 
-function onUp(e) {
+function onUp() {
     if (!isDrawMode || !ptrCell) { ptrCell = null; return; }
     if (!ptrDragged) {
-        // Single click → cycle: empty→wall→tower→empty
+        // Single click: cycle empty→wall→tower→empty
         const { row, col } = ptrCell;
         if (inGrid(row, col)) {
             setCell(row, col, (grid[row][col] + 1) % 3);
@@ -203,19 +200,16 @@ function bresenham(from, to, fn) {
 
 // ── Game control ───────────────────────────────────────────────────────────
 function toggleGame() {
-    if (gameOver) {
-        gameOver   = false;
-        enemies    = [];
-        bullets    = [];
-        spawnTimer = 0;
-        flashAlpha = 0;
-    }
     isRunning = !isRunning;
     if (isRunning) {
         startButton.textContent = 'Pause';
         startButton.classList.add('active');
         if (isDrawMode) toggleDrawMode();
-        lastTime = performance.now();
+        enemies    = [];
+        bullets    = [];
+        spawnTimer = SPAWN_CD; // spawn immediately on start
+        flashAlpha = 0;
+        lastTime   = performance.now();
         requestAnimationFrame(loop);
     } else {
         startButton.textContent = 'Initiate Attack';
@@ -229,6 +223,7 @@ function toggleDrawMode() {
         drawButton.textContent = 'Exit Draw Mode';
         drawButton.classList.add('active');
         interactionCanvas.classList.add('draw-mode');
+        interactionCanvas.style.pointerEvents = 'auto'; // clear any stale inline style
         if (isRunning) toggleGame();
     } else {
         drawButton.textContent = 'Draw Mode';
@@ -244,7 +239,6 @@ function clearAll() {
     enemies   = [];
     bullets   = [];
     towerCD   = {};
-    gameOver  = false;
     flashAlpha = 0;
     spawnTimer = 0;
     drawFrame();
@@ -261,16 +255,18 @@ function loop(ts) {
 }
 
 function update(dt) {
-    // Spawn
+    // Spawn wave
     spawnTimer += dt;
-    if (spawnTimer >= SPAWN_CD) { spawnTimer = 0; spawnEnemy(); }
+    if (spawnTimer >= SPAWN_CD) {
+        spawnTimer = 0;
+        for (let i = 0; i < WAVE_BURST; i++) spawnEnemy();
+    }
 
     // Move enemies
     for (let i = enemies.length - 1; i >= 0; i--) {
         moveEnemy(enemies[i], dt);
         const dx = enemies[i].x - targetX, dy = enemies[i].y - targetY;
-        if (dx * dx + dy * dy < 9) {
-            // Reached target
+        if (dx * dx + dy * dy < ENEMY_R * ENEMY_R) {
             enemies.splice(i, 1);
             flashAlpha = 1.0;
         }
@@ -281,7 +277,7 @@ function update(dt) {
         for (let c = 0; c < cols; c++) {
             if (grid[r][c] !== 2) continue;
             const key = `${r},${c}`;
-            towerCD[key] = (towerCD[key] ?? TOWER_FIRE_CD) - dt;
+            towerCD[key] = (towerCD[key] ?? 0) - dt;
             if (towerCD[key] <= 0) {
                 towerCD[key] = TOWER_FIRE_CD;
                 const tx = c * CELL + CELL / 2, ty = r * CELL + CELL / 2;
@@ -307,7 +303,7 @@ function update(dt) {
         for (let j = enemies.length - 1; j >= 0; j--) {
             const en = enemies[j];
             const dx = b.x - en.x, dy = b.y - en.y;
-            if (dx * dx + dy * dy < (ENEMY_R + 1) * (ENEMY_R + 1)) {
+            if (dx * dx + dy * dy < (ENEMY_R + 2) * (ENEMY_R + 2)) {
                 if (--en.hp <= 0) enemies.splice(j, 1);
                 hit = true; break;
             }
@@ -316,16 +312,16 @@ function update(dt) {
     }
 
     // Decay flash
-    if (flashAlpha > 0) flashAlpha = Math.max(0, flashAlpha - dt * 2);
+    if (flashAlpha > 0) flashAlpha = Math.max(0, flashAlpha - dt * 2.5);
 }
 
 function spawnEnemy() {
     let x, y;
     const edge = Math.floor(Math.random() * 4);
     if      (edge === 0) { x = Math.random() * cssW; y = -ENEMY_R * 2; }
-    else if (edge === 1) { x = cssW + ENEMY_R * 2; y = Math.random() * cssH; }
+    else if (edge === 1) { x = cssW + ENEMY_R * 2;   y = Math.random() * cssH; }
     else if (edge === 2) { x = Math.random() * cssW; y = cssH + ENEMY_R * 2; }
-    else                 { x = -ENEMY_R * 2;         y = Math.random() * cssH; }
+    else                 { x = -ENEMY_R * 2;          y = Math.random() * cssH; }
     enemies.push({ x, y, hp: ENEMY_HP });
 }
 
@@ -339,26 +335,21 @@ function moveEnemy(en, dt) {
     let newX = en.x + nx * step;
     let newY = en.y + ny * step;
 
-    // Wall collision — try to slide
     const nc = Math.floor(newX / CELL), nr = Math.floor(newY / CELL);
     if (inGrid(nr, nc) && grid[nr][nc] === 1) {
-        // try slide x only
-        const nrX = Math.floor(en.y / CELL), ncX = Math.floor(newX / CELL);
-        // try slide y only
-        const nrY = Math.floor(newY / CELL), ncY = Math.floor(en.x / CELL);
-        const slideX = inGrid(nrX, ncX) && grid[nrX][ncX] !== 1;
-        const slideY = inGrid(nrY, ncY) && grid[nrY][ncY] !== 1;
-        if (slideX && !slideY)       { newY = en.y; }
-        else if (slideY && !slideX)  { newX = en.x; }
-        else if (slideX && slideY)   { newY = en.y; } // prefer sliding x
+        const canSlideX = inGrid(Math.floor(en.y / CELL), Math.floor(newX / CELL)) &&
+                          grid[Math.floor(en.y / CELL)][Math.floor(newX / CELL)] !== 1;
+        const canSlideY = inGrid(Math.floor(newY / CELL), Math.floor(en.x / CELL)) &&
+                          grid[Math.floor(newY / CELL)][Math.floor(en.x / CELL)] !== 1;
+        if      (canSlideX && !canSlideY) newY = en.y;
+        else if (canSlideY && !canSlideX) newX = en.x;
+        else if (canSlideX)               newY = en.y;
         else {
-            // fully blocked — nudge perpendicularly
-            newX = en.x + ny * step;
-            newY = en.y - nx * step;
-            const nr2 = Math.floor(newY / CELL), nc2 = Math.floor(newX / CELL);
-            if (inGrid(nr2, nc2) && grid[nr2][nc2] === 1) {
-                newX = en.x; newY = en.y; // give up this frame
-            }
+            // fully blocked — try perpendicular nudge
+            const px = en.x + ny * step, py = en.y - nx * step;
+            const pr = Math.floor(py / CELL), pc = Math.floor(px / CELL);
+            if (inGrid(pr, pc) && grid[pr][pc] !== 1) { newX = px; newY = py; }
+            else { newX = en.x; newY = en.y; }
         }
     }
 
@@ -380,11 +371,11 @@ function nearestEnemy(tx, ty) {
 function drawFrame() {
     ctx.clearRect(0, 0, cssW, cssH);
 
-    const dark       = document.documentElement.getAttribute('data-theme') === 'dark';
-    const wallColor  = dark ? '#555' : '#d0d0d0';
-    const towerColor = '#ffce6b';
-    const innerColor = dark ? '#333' : '#b0b0b0';
-    const enemyColor = dark ? '#999' : '#777';
+    const dark      = document.documentElement.getAttribute('data-theme') === 'dark';
+    const wallColor = dark ? '#555' : '#c8c8c8';
+    const innerCol  = dark ? '#333' : '#a8a8a8';
+    const enemyCol  = dark ? '#c0392b' : '#c0392b'; // red-tinted enemies
+    const bulletCol = '#ffce6b';
 
     // Walls & towers
     for (let r = 0; r < rows; r++) {
@@ -394,35 +385,35 @@ function drawFrame() {
                 ctx.fillStyle = wallColor;
                 ctx.fillRect(c * CELL, r * CELL, CELL - 1, CELL - 1);
             } else if (v === 2) {
-                ctx.fillStyle = towerColor;
+                ctx.fillStyle = bulletCol;
                 ctx.fillRect(c * CELL, r * CELL, CELL - 1, CELL - 1);
-                ctx.fillStyle = innerColor;
+                ctx.fillStyle = innerCol;
                 ctx.fillRect(c * CELL + 3, r * CELL + 3, CELL - 7, CELL - 7);
             }
         }
     }
 
-    // Enemies
+    // Enemies — red squares with opacity by health
     for (const en of enemies) {
         const t = en.hp / ENEMY_HP;
-        ctx.fillStyle = enemyColor;
-        ctx.globalAlpha = 0.4 + 0.6 * t;
+        ctx.globalAlpha = 0.5 + 0.5 * t;
+        ctx.fillStyle   = enemyCol;
         ctx.fillRect(en.x - ENEMY_R, en.y - ENEMY_R, ENEMY_R * 2, ENEMY_R * 2);
     }
     ctx.globalAlpha = 1;
 
     // Bullets
-    ctx.fillStyle = '#ffce6b';
+    ctx.fillStyle = bulletCol;
     for (const b of bullets) {
-        ctx.fillRect(b.x - 1, b.y - 1, 2, 2);
+        ctx.fillRect(b.x - 1.5, b.y - 1.5, 3, 3);
     }
 
-    // Flash ring when target is hit
+    // Target flash ring
     if (flashAlpha > 0) {
-        ctx.strokeStyle = `rgba(255, 0, 0, ${flashAlpha})`;
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = `rgba(255,0,0,${flashAlpha})`;
+        ctx.lineWidth   = 1;
         ctx.beginPath();
-        ctx.arc(targetX, targetY, 6 + (1 - flashAlpha) * 10, 0, Math.PI * 2);
+        ctx.arc(targetX, targetY, 4 + (1 - flashAlpha) * 12, 0, Math.PI * 2);
         ctx.stroke();
     }
 
