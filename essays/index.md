@@ -4,6 +4,33 @@ title: Essays
 permalink: /essays/
 ---
 
+<style>
+/* Override default-layout link styles for essay titles */
+.essays-list .essay-title a {
+    text-decoration: none !important;
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+.essays-list .essay-title a:hover {
+    opacity: 0.65;
+    color: var(--text-color) !important;
+    text-decoration: none !important;
+}
+.essays-list research-entry {
+    margin-bottom: 2rem;
+}
+.essays-list .essay-sub {
+    opacity: 0.5;
+    font-style: italic;
+}
+.essays-list p {
+    color: var(--text-color);
+    opacity: 0.7;
+    font-size: 0.9rem;
+    margin-top: 0.2rem;
+}
+</style>
+
 <div class="container research-page">
     <div class="left-column">
         <h1 class="name">Essays</h1>
@@ -14,37 +41,37 @@ permalink: /essays/
             <a href="https://github.com/LangxiaoXie">GitHub</a>
         </div>
     </div>
-    <div class="right-column">
+    <div class="right-column essays-list">
         <research-entry>
-            <p><a href="/essays/nietzsche-cybernetician.html"><strong>Nietzsche: The First Cybernetician?</strong></a></p>
+            <p class="essay-title"><a href="/essays/nietzsche-cybernetician.html">Nietzsche: The First Cybernetician?</a></p>
             <p>On Nietzsche contra Heidegger's reading, via the vocabulary of second-order cybernetics.</p>
         </research-entry>
         <research-entry>
-            <p><a href="/essays/rousseau-contra-thoreau.html"><strong>Rousseau contra Thoreau</strong></a> <span style="opacity:0.5">— Vicious Circle, Legislator, and the Care of the Self</span></p>
+            <p class="essay-title"><a href="/essays/rousseau-contra-thoreau.html">Rousseau contra Thoreau</a> <span class="essay-sub">— Vicious Circle, Legislator, and the Care of the Self</span></p>
             <p>Reading Rousseau from Thoreau's perspective on society, nature, and the mode of individual existence.</p>
         </research-entry>
         <research-entry>
-            <p><a href="/essays/end-of-order.html"><strong>The End of Order, the Order of Ends</strong></a> <span style="opacity:0.5">— Civil Society, Eschatology, Cybernetics</span></p>
+            <p class="essay-title"><a href="/essays/end-of-order.html">The End of Order, the Order of Ends</a> <span class="essay-sub">— Civil Society, Eschatology, Cybernetics</span></p>
             <p>Hegel and Tocqueville on civil society, and the cybernetic supplement to their teleological visions of history.</p>
         </research-entry>
         <research-entry>
-            <p><a href="/essays/theology-after-ontotheology.html"><strong>Theology After Ontotheology</strong></a> <span style="opacity:0.5">— Givenness and Its Vicissitude</span></p>
+            <p class="essay-title"><a href="/essays/theology-after-ontotheology.html">Theology After Ontotheology</a> <span class="essay-sub">— Givenness and Its Vicissitude</span></p>
             <p>Heidegger, Marion, and the question of God after the critique of onto-theology.</p>
         </research-entry>
         <research-entry>
-            <p><a href="/essays/what-is-a-world.html"><strong>What is a World?</strong></a> <span style="opacity:0.5">— The Antinomy of Arendt's Work</span></p>
+            <p class="essay-title"><a href="/essays/what-is-a-world.html">What is a World?</a> <span class="essay-sub">— The Antinomy of Arendt's Work</span></p>
             <p>On Arendt's political thought, the world as appearing-space, and the tension between natality and plurality.</p>
         </research-entry>
         <research-entry>
-            <p><a href="/essays/crisis-european-sciences.html"><strong>The Crisis of European Sciences and Immanent Ethics</strong></a></p>
+            <p class="essay-title"><a href="/essays/crisis-european-sciences.html">The Crisis of European Sciences and Immanent Ethics</a></p>
             <p>Husserl, Maimonides, and Deleuze on the foundations of a naturalized ethics.</p>
         </research-entry>
         <research-entry>
-            <p><a href="/essays/adam-smith-political-economy.html"><strong>Adam Smith and the Demands of Political Economy</strong></a></p>
+            <p class="essay-title"><a href="/essays/adam-smith-political-economy.html">Adam Smith and the Demands of Political Economy</a></p>
             <p>Polanyi's reading of Smith, and whether the attribution of laissez-faire liberalism is justified.</p>
         </research-entry>
         <research-entry>
-            <p><a href="/essays/spinoza-practical-philosophies.html"><strong>Spinoza: Practical Philosophies?</strong></a> <span style="opacity:0.5">— On the Third Kind of Knowledge and Ethics</span></p>
+            <p class="essay-title"><a href="/essays/spinoza-practical-philosophies.html">Spinoza: Practical Philosophies?</a> <span class="essay-sub">— On the Third Kind of Knowledge and Ethics</span></p>
             <p>On Spinoza's closing propositions in the <em>Ethics</em> and what it means for the mind to exist <em>sub specie aeternitatis</em>.</p>
         </research-entry>
     </div>

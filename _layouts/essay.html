@@ -6,275 +6,299 @@
     <meta name="color-scheme" content="light dark">
     <title>{{ page.title }} — {{ site.title }}</title>
     <link rel="icon" type="image/x-icon" href="{{ site.baseurl }}/favicon.ico" sizes="96x96">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Special+Gothic+Expanded+One&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <!-- Source Serif 4: closest Google Fonts match to Iowan Old Style BT -->
+    <!-- Inter: closest free match to GT America -->
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
+        /* ── Gruvbox-inspired palette (matches ThinkingMachines exactly) ── */
         :root {
-            --bg-color: #f5f5f5;
-            --text-color: #333;
-            --dim-color: #888;
-            --border-color: #ddd;
-            --link-hover-color: #ffce6b;
-            --button-bg: #333;
-            --button-text: white;
-            --blockquote-border: #ccc;
-            --blockquote-text: #666;
+            --bg:   white;
+            --fg:   #282828;
+            --fg2:  #504945;
+            --fg4:  #676767;
+            --fg5:  #969696;
+            --bg1:  #ebdbb2;
+            --bg2:  #d5c4a1;
+            --border: color-mix(in srgb, #282828 12%, transparent);
+            --link-underline: color-mix(in srgb, #282828 20%, transparent);
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-serif: 'Source Serif 4', 'Iowan Old Style BT', Georgia, serif;
+            --content-max: 660px;
+            --content-pad: 1.3rem;
         }
 
         [data-theme="dark"] {
-            --bg-color: #222;
-            --text-color: #e0e0e0;
-            --dim-color: #888;
-            --border-color: #333;
-            --link-hover-color: #ffce6b;
-            --button-bg: #444;
-            --button-text: #e0e0e0;
-            --blockquote-border: #444;
-            --blockquote-text: #999;
+            --bg:   #282828;
+            --fg:   #ebdbb2;
+            --fg2:  #d5c4a1;
+            --fg4:  #a89984;
+            --fg5:  #7c6f64;
+            --bg1:  #3c3836;
+            --bg2:  #504945;
+            --border: color-mix(in srgb, #ebdbb2 15%, transparent);
+            --link-underline: color-mix(in srgb, #ebdbb2 25%, transparent);
         }
 
-        html { overflow-y: scroll; }
+        html {
+            overflow-y: scroll;
+            scroll-padding-top: 4rem;
+        }
 
         body {
-            font-family: 'Noto Sans', sans-serif;
+            font-family: var(--font-serif);
+            font-size: 17px;
             line-height: 1.6;
+            background-color: var(--bg);
+            color: var(--fg);
             margin: 0;
             padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* ── Top nav (same as default layout) ── */
-        .top-nav {
+        /* ── Site header (matches default layout nav) ── */
+        .site-nav {
             position: fixed;
-            top: 1.2rem;
-            right: 1.5rem;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 54px;
             display: flex;
-            gap: 1.5rem;
-            font-family: 'Noto Sans', sans-serif;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            background-color: var(--bg);
+            border-bottom: 1px solid var(--border);
             z-index: 200;
+            transition: background-color 0.3s ease;
         }
 
-        .top-nav a {
-            color: var(--text-color);
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+        }
+
+        .nav-left a {
+            color: var(--fg4);
             text-decoration: none;
-            font-weight: 400;
             transition: color 0.2s;
         }
 
-        .top-nav a:hover { color: var(--link-hover-color); }
+        .nav-left a:hover { color: var(--fg); }
 
-        .theme-toggle {
-            position: fixed;
-            top: calc(1.2rem + 0.8rem);
-            left: 1.5rem;
-            width: 30px;
-            height: 30px;
+        .nav-sep { color: var(--fg5); }
+
+        .theme-btn {
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            background-color: var(--button-bg);
-            border: 2px solid var(--text-color);
+            background-color: var(--bg1);
+            border: 1.5px solid var(--border);
             cursor: pointer;
+            flex-shrink: 0;
             padding: 0;
-            z-index: 250;
-            transform: translateY(-50%);
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            position: relative;
             overflow: hidden;
+            transition: border-color 0.2s, background-color 0.3s;
         }
 
-        .theme-toggle::before {
+        .theme-btn::before {
             content: '';
             position: absolute;
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
-            background-color: var(--button-text);
+            background-color: var(--fg4);
             top: 5px;
             left: 5px;
-            transition: transform 0.3s ease, background-color 0.3s ease;
+            transition: transform 0.3s ease, background-color 0.3s;
         }
 
-        [data-theme="dark"] .theme-toggle::before {
-            transform: translateX(10px);
-            background-color: var(--link-hover-color);
+        [data-theme="dark"] .theme-btn::before {
+            transform: translateX(8px);
+            background-color: var(--bg1);
         }
 
-        .theme-toggle:hover {
-            border-color: var(--link-hover-color);
-            transform: translateY(-50%) scale(1.1);
-        }
+        .theme-btn:hover { border-color: var(--fg4); }
 
-        /* ── Essay layout ── */
-        .essay-page {
-            max-width: 660px;
+        /* ── Page body ── */
+        .essay-wrap {
+            max-width: calc(var(--content-max) + 2 * var(--content-pad));
             margin: 0 auto;
-            padding: 5rem 2rem 6rem;
+            padding: 5rem var(--content-pad) 6rem;
         }
 
-        .back-link {
+        /* ── Header ── */
+        .essay-back {
             display: inline-block;
-            font-size: 0.85rem;
-            color: var(--dim-color);
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            color: var(--fg4);
             text-decoration: none;
-            margin-bottom: 3.5rem;
+            margin-bottom: 3rem;
             transition: color 0.2s;
         }
 
-        .back-link:hover { color: var(--link-hover-color); }
+        .essay-back:hover { color: var(--fg); }
 
-        .essay-label {
+        .essay-kicker {
+            font-family: var(--font-sans);
             font-size: 0.72rem;
-            letter-spacing: 0.13em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: var(--dim-color);
-            margin-bottom: 0.9rem;
+            color: var(--fg5);
+            margin-bottom: 0.75rem;
             display: block;
         }
 
-        .essay-page h1 {
-            font-family: 'Special Gothic Expanded One', sans-serif;
-            font-size: clamp(1.6rem, 4vw, 2.2rem);
-            font-weight: normal;
-            letter-spacing: 0.03em;
-            color: var(--text-color);
+        .essay-wrap h1 {
+            font-family: var(--font-serif);
+            font-size: clamp(1.7rem, 4vw, 2.4rem);
+            font-weight: 600;
             line-height: 1.15;
-            margin: 0 0 0.6rem;
+            color: var(--fg);
+            margin: 0 0 0.5rem;
+            letter-spacing: -0.01em;
         }
 
         .essay-subtitle {
-            font-family: 'Noto Serif', serif;
+            font-family: var(--font-serif);
             font-size: 1.05rem;
             font-style: italic;
-            color: var(--dim-color);
+            color: var(--fg4);
             margin: 0 0 2.5rem;
         }
 
-        /* ── Article body ── */
-        article {
-            font-family: 'Noto Serif', Georgia, serif;
-            font-size: 1.05rem;
-            line-height: 1.85;
-            border-top: 1px solid var(--border-color);
-            padding-top: 2.2rem;
+        /* ── Article ── */
+        .content {
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
         }
 
-        article p {
-            margin: 0 0 1.3em;
-            color: var(--text-color);
+        .content p {
+            margin: 0 0 1.25em;
+            color: var(--fg);
         }
 
-        article p.dropcap::first-letter {
-            font-size: 3.4em;
+        .content p.dropcap::first-letter {
+            font-size: 3.3em;
             font-weight: 600;
             float: left;
             line-height: 0.78;
-            margin-right: 0.07em;
-            margin-top: 0.07em;
-            color: var(--text-color);
+            margin-right: 0.06em;
+            margin-top: 0.06em;
+            color: var(--fg);
         }
 
-        article h2 {
-            font-family: 'Noto Serif', serif;
+        .content h2 {
+            font-family: var(--font-serif);
             font-size: 1rem;
             font-weight: 400;
             font-style: italic;
-            color: var(--text-color);
-            margin: 2.4em 0 0.8em;
-            letter-spacing: 0.02em;
+            color: var(--fg2);
+            margin: 2.4em 0 0.75em;
         }
 
-        blockquote {
-            margin: 1.8em 0;
-            padding: 0 0 0 1.2em;
-            border-left: 2px solid var(--blockquote-border);
+        .content blockquote {
+            border-left: 2px solid color-mix(in srgb, var(--fg4) 35%, var(--bg) 65%);
+            color: var(--fg2);
+            margin: 1.6rem 0 1.6rem 0;
+            padding: 0.1rem 0 0.1rem 1.25rem;
         }
 
-        blockquote p {
+        .content blockquote p {
             font-style: italic;
-            font-size: 0.95rem;
-            color: var(--blockquote-text);
-            line-height: 1.7;
+            font-size: 1rem;
+            line-height: 1.55;
             margin-bottom: 0.4em;
+            color: var(--fg2);
         }
 
-        blockquote cite {
+        .content blockquote cite {
             display: block;
             font-style: normal;
-            font-family: 'Noto Sans', sans-serif;
+            font-family: var(--font-sans);
             font-size: 0.72rem;
-            letter-spacing: 0.1em;
-            color: var(--dim-color);
+            letter-spacing: 0.08em;
             text-transform: uppercase;
+            color: var(--fg5);
             margin-top: 0.6rem;
         }
 
-        article em { font-style: italic; }
-        article strong { font-weight: 600; }
+        .content em { font-style: italic; }
+        .content strong { font-weight: 600; }
 
-        article a {
-            color: var(--text-color);
+        .content a {
+            color: inherit;
             text-decoration: underline;
-            text-decoration-color: rgba(255,206,107,0.4);
-            transition: color 0.2s;
+            text-decoration-color: var(--link-underline);
+            transition: color 0.2s, text-decoration-color 0.2s;
         }
 
-        article a:hover { color: var(--link-hover-color); }
+        .content a:hover {
+            color: var(--fg2);
+            text-decoration-color: color-mix(in srgb, var(--fg2) 40%, transparent);
+        }
 
+        /* ── Footer ── */
         .essay-footer {
-            margin-top: 3.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border-color);
+            margin-top: 3rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--border);
+            font-family: var(--font-sans);
         }
 
         .essay-footer a {
-            font-size: 0.85rem;
-            color: var(--dim-color);
+            font-size: 0.82rem;
+            color: var(--fg4);
             text-decoration: none;
             transition: color 0.2s;
         }
 
-        .essay-footer a:hover { color: var(--link-hover-color); }
+        .essay-footer a:hover { color: var(--fg); }
 
         @media (max-width: 600px) {
-            .essay-page { padding: 4rem 1.2rem 4rem; }
-            article { font-size: 1rem; }
+            .essay-wrap { padding-top: 4.5rem; }
+            .essay-wrap h1 { font-size: 1.6rem; }
         }
     </style>
     <script>
         (function() {
             var root = document.documentElement;
-            function applyTheme(theme) {
-                if (theme === 'dark') root.setAttribute('data-theme', 'dark');
+            function applyTheme(t) {
+                if (t === 'dark') root.setAttribute('data-theme','dark');
                 else root.removeAttribute('data-theme');
             }
-            var stored;
-            try { stored = localStorage.getItem('theme'); } catch(e) {}
-            var prefersDark = false;
-            try { prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch(e) {}
-            applyTheme(stored || (prefersDark ? 'dark' : 'light'));
+            var stored; try { stored = localStorage.getItem('theme'); } catch(e) {}
+            var sys = false; try { sys = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch(e) {}
+            applyTheme(stored || (sys ? 'dark' : 'light'));
         })();
     </script>
 </head>
 <body>
-    <nav class="top-nav">
-        <a href="{{ site.baseurl }}/">Luc Xie</a>
-        <span>/</span>
-        <a href="{{ site.baseurl }}/projects/">Projects</a>
-        <span>/</span>
-        <a href="{{ site.baseurl }}/essays/">Essays</a>
-    </nav>
+    <header class="site-nav">
+        <div class="nav-left">
+            <a href="{{ site.baseurl }}/">Luc Xie</a>
+            <span class="nav-sep">/</span>
+            <a href="{{ site.baseurl }}/projects/">Projects</a>
+            <span class="nav-sep">/</span>
+            <a href="{{ site.baseurl }}/essays/">Essays</a>
+        </div>
+        <button id="themeBtn" class="theme-btn" aria-label="Toggle theme"></button>
+    </header>
 
-    <button id="darkModeButton" class="theme-toggle" aria-label="Toggle dark mode"></button>
+    <div class="essay-wrap">
+        <a href="{{ site.baseurl }}/essays/" class="essay-back">← Essays</a>
 
-    <div class="essay-page">
-        <a href="{{ site.baseurl }}/essays/" class="back-link">← Essays</a>
-
-        <span class="essay-label">Essay</span>
+        <span class="essay-kicker">Essay</span>
         <h1>{{ page.title }}</h1>
         {% if page.subtitle %}<p class="essay-subtitle">{{ page.subtitle }}</p>{% endif %}
 
-        <article>
+        <div class="content">
             {{ content }}
-        </article>
+        </div>
 
         <div class="essay-footer">
             <a href="{{ site.baseurl }}/essays/">← Back to essays</a>
@@ -284,15 +308,24 @@
     <script>
         (function() {
             var root = document.documentElement;
-            function applyTheme(t) { if(t==='dark') root.setAttribute('data-theme','dark'); else root.removeAttribute('data-theme'); }
+            function applyTheme(t) {
+                if (t==='dark') root.setAttribute('data-theme','dark');
+                else root.removeAttribute('data-theme');
+            }
             function getStored() { try { return localStorage.getItem('theme'); } catch(e) { return null; } }
             function setStored(t) { try { localStorage.setItem('theme', t); } catch(e) {} }
-            var btn = document.getElementById('darkModeButton');
+            var btn = document.getElementById('themeBtn');
             if (btn) {
                 btn.addEventListener('click', function() {
                     var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
                     applyTheme(next); setStored(next);
                 });
+            }
+            var mql; try { mql = window.matchMedia('(prefers-color-scheme: dark)'); } catch(e) {}
+            if (mql) {
+                var fn = function(e) { if (!getStored()) applyTheme(e.matches ? 'dark' : 'light'); };
+                if (mql.addEventListener) mql.addEventListener('change', fn);
+                else if (mql.addListener) mql.addListener(fn);
             }
         })();
     </script>
