@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>{{ page.title }} — {{ site.title }}</title>
+    <link rel="icon" type="image/x-icon" href="{{ site.baseurl }}/favicon.ico" sizes="96x96">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Special+Gothic+Expanded+One&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --dim-color: #888;
+            --border-color: #ddd;
+            --link-hover-color: #ffce6b;
+            --button-bg: #333;
+            --button-text: white;
+            --blockquote-border: #ccc;
+            --blockquote-text: #666;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #222;
+            --text-color: #e0e0e0;
+            --dim-color: #888;
+            --border-color: #333;
+            --link-hover-color: #ffce6b;
+            --button-bg: #444;
+            --button-text: #e0e0e0;
+            --blockquote-border: #444;
+            --blockquote-text: #999;
+        }
+
+        html { overflow-y: scroll; }
+
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* ── Top nav (same as default layout) ── */
+        .top-nav {
+            position: fixed;
+            top: 1.2rem;
+            right: 1.5rem;
+            display: flex;
+            gap: 1.5rem;
+            font-family: 'Noto Sans', sans-serif;
+            z-index: 200;
+        }
+
+        .top-nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 400;
+            transition: color 0.2s;
+        }
+
+        .top-nav a:hover { color: var(--link-hover-color); }
+
+        .theme-toggle {
+            position: fixed;
+            top: calc(1.2rem + 0.8rem);
+            left: 1.5rem;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--button-bg);
+            border: 2px solid var(--text-color);
+            cursor: pointer;
+            padding: 0;
+            z-index: 250;
+            transform: translateY(-50%);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            overflow: hidden;
+        }
+
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--button-text);
+            top: 5px;
+            left: 5px;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        [data-theme="dark"] .theme-toggle::before {
+            transform: translateX(10px);
+            background-color: var(--link-hover-color);
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--link-hover-color);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* ── Essay layout ── */
+        .essay-page {
+            max-width: 660px;
+            margin: 0 auto;
+            padding: 5rem 2rem 6rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            font-size: 0.85rem;
+            color: var(--dim-color);
+            text-decoration: none;
+            margin-bottom: 3.5rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: var(--link-hover-color); }
+
+        .essay-label {
+            font-size: 0.72rem;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            color: var(--dim-color);
+            margin-bottom: 0.9rem;
+            display: block;
+        }
+
+        .essay-page h1 {
+            font-family: 'Special Gothic Expanded One', sans-serif;
+            font-size: clamp(1.6rem, 4vw, 2.2rem);
+            font-weight: normal;
+            letter-spacing: 0.03em;
+            color: var(--text-color);
+            line-height: 1.15;
+            margin: 0 0 0.6rem;
+        }
+
+        .essay-subtitle {
+            font-family: 'Noto Serif', serif;
+            font-size: 1.05rem;
+            font-style: italic;
+            color: var(--dim-color);
+            margin: 0 0 2.5rem;
+        }
+
+        /* ── Article body ── */
+        article {
+            font-family: 'Noto Serif', Georgia, serif;
+            font-size: 1.05rem;
+            line-height: 1.85;
+            border-top: 1px solid var(--border-color);
+            padding-top: 2.2rem;
+        }
+
+        article p {
+            margin: 0 0 1.3em;
+            color: var(--text-color);
+        }
+
+        article p.dropcap::first-letter {
+            font-size: 3.4em;
+            font-weight: 600;
+            float: left;
+            line-height: 0.78;
+            margin-right: 0.07em;
+            margin-top: 0.07em;
+            color: var(--text-color);
+        }
+
+        article h2 {
+            font-family: 'Noto Serif', serif;
+            font-size: 1rem;
+            font-weight: 400;
+            font-style: italic;
+            color: var(--text-color);
+            margin: 2.4em 0 0.8em;
+            letter-spacing: 0.02em;
+        }
+
+        blockquote {
+            margin: 1.8em 0;
+            padding: 0 0 0 1.2em;
+            border-left: 2px solid var(--blockquote-border);
+        }
+
+        blockquote p {
+            font-style: italic;
+            font-size: 0.95rem;
+            color: var(--blockquote-text);
+            line-height: 1.7;
+            margin-bottom: 0.4em;
+        }
+
+        blockquote cite {
+            display: block;
+            font-style: normal;
+            font-family: 'Noto Sans', sans-serif;
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            color: var(--dim-color);
+            text-transform: uppercase;
+            margin-top: 0.6rem;
+        }
+
+        article em { font-style: italic; }
+        article strong { font-weight: 600; }
+
+        article a {
+            color: var(--text-color);
+            text-decoration: underline;
+            text-decoration-color: rgba(255,206,107,0.4);
+            transition: color 0.2s;
+        }
+
+        article a:hover { color: var(--link-hover-color); }
+
+        .essay-footer {
+            margin-top: 3.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .essay-footer a {
+            font-size: 0.85rem;
+            color: var(--dim-color);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .essay-footer a:hover { color: var(--link-hover-color); }
+
+        @media (max-width: 600px) {
+            .essay-page { padding: 4rem 1.2rem 4rem; }
+            article { font-size: 1rem; }
+        }
+    </style>
+    <script>
+        (function() {
+            var root = document.documentElement;
+            function applyTheme(theme) {
+                if (theme === 'dark') root.setAttribute('data-theme', 'dark');
+                else root.removeAttribute('data-theme');
+            }
+            var stored;
+            try { stored = localStorage.getItem('theme'); } catch(e) {}
+            var prefersDark = false;
+            try { prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch(e) {}
+            applyTheme(stored || (prefersDark ? 'dark' : 'light'));
+        })();
+    </script>
+</head>
+<body>
+    <nav class="top-nav">
+        <a href="{{ site.baseurl }}/">Luc Xie</a>
+        <span>/</span>
+        <a href="{{ site.baseurl }}/projects/">Projects</a>
+        <span>/</span>
+        <a href="{{ site.baseurl }}/essays/">Essays</a>
+    </nav>
+
+    <button id="darkModeButton" class="theme-toggle" aria-label="Toggle dark mode"></button>
+
+    <div class="essay-page">
+        <a href="{{ site.baseurl }}/essays/" class="back-link">← Essays</a>
+
+        <span class="essay-label">Essay</span>
+        <h1>{{ page.title }}</h1>
+        {% if page.subtitle %}<p class="essay-subtitle">{{ page.subtitle }}</p>{% endif %}
+
+        <article>
+            {{ content }}
+        </article>
+
+        <div class="essay-footer">
+            <a href="{{ site.baseurl }}/essays/">← Back to essays</a>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            var root = document.documentElement;
+            function applyTheme(t) { if(t==='dark') root.setAttribute('data-theme','dark'); else root.removeAttribute('data-theme'); }
+            function getStored() { try { return localStorage.getItem('theme'); } catch(e) { return null; } }
+            function setStored(t) { try { localStorage.setItem('theme', t); } catch(e) {} }
+            var btn = document.getElementById('darkModeButton');
+            if (btn) {
+                btn.addEventListener('click', function() {
+                    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                    applyTheme(next); setStored(next);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>
