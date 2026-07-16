@@ -5,7 +5,6 @@ permalink: /essays/
 ---
 
 <style>
-/* Override default-layout link styles for essay titles */
 .essays-list .essay-title a {
     text-decoration: none !important;
     font-weight: 500;
@@ -13,19 +12,18 @@ permalink: /essays/
 }
 .essays-list .essay-title a:hover {
     opacity: 0.65;
-    color: var(--text-color) !important;
+    color: var(--fg) !important;
     text-decoration: none !important;
 }
 .essays-list research-entry {
     margin-bottom: 2rem;
 }
 .essays-list .essay-sub {
-    opacity: 0.5;
+    color: var(--fg4);
     font-style: italic;
 }
 .essays-list p {
-    color: var(--text-color);
-    opacity: 0.7;
+    color: var(--fg4);
     font-size: 0.9rem;
     margin-top: 0.2rem;
 }

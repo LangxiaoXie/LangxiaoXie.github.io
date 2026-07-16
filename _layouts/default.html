@@ -6,53 +6,60 @@
     <meta name="color-scheme" content="light dark">
     <title>{{ site.title }}</title>
     <link rel="icon" type="image/x-icon" href="{{ site.baseurl }}/favicon.ico" sizes="96x96">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
+        /* ── Gruvbox-inspired palette (matches ThinkingMachines) ── */
         :root {
-            --bg-color: #f5f5f5;
-            --text-color: #333;
-            --link-hover-color: #ffce6b;
-            --button-bg: #333;
-            --button-text: white;
-            --active-button-bg: #ffce6b;
-            --canvas-bg: #f5f5f5;
-            --cell-color: #dedede;
+            --bg:            white;
+            --fg:            #282828;
+            --fg2:           #504945;
+            --fg4:           #676767;
+            --fg5:           #969696;
+            --bg1:           #ebdbb2;
+            --bg2:           #d5c4a1;
+            --border:        color-mix(in srgb, #282828 12%, transparent);
+            --hover-bg:      rgba(128,128,128,0.08);
+            --canvas-cell:   #d5c4a1;
+            --font-sans:     'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-serif:    'Source Serif 4', 'Iowan Old Style BT', Georgia, serif;
         }
 
         [data-theme="dark"] {
-            --bg-color: #222;
-            --text-color: #e0e0e0;
-            --link-hover-color: #ffce6b;
-            --button-bg: #444;
-            --button-text: #e0e0e0;
-            --active-button-bg: #ffce6b;
-            --canvas-bg: #222;
-            --cell-color: #555;
+            --bg:            #282828;
+            --fg:            #ebdbb2;
+            --fg2:           #d5c4a1;
+            --fg4:           #a89984;
+            --fg5:           #7c6f64;
+            --bg1:           #3c3836;
+            --bg2:           #504945;
+            --border:        color-mix(in srgb, #ebdbb2 12%, transparent);
+            --hover-bg:      rgba(235,219,178,0.06);
+            --canvas-cell:   #3c3836;
         }
 
-        html {
-            overflow-y: scroll;
-        }
+        html { overflow-y: scroll; }
 
         body {
-            font-family: 'Noto Sans', sans-serif;
+            font-family: var(--font-serif);
+            font-size: 17px;
             line-height: 1.6;
             margin: 0;
             padding: 0;
-            background-color: var(--bg-color);
+            background-color: var(--bg);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            color: var(--text-color);
+            color: var(--fg);
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
+        /* ── Layout ── */
         .container {
             max-width: 900px;
             margin: 5rem auto;
             padding: 2rem;
             display: grid;
-            grid-template-columns: 250px 1fr;
+            grid-template-columns: 220px 1fr;
             gap: 3rem;
             flex: 1;
             position: relative;
@@ -67,29 +74,32 @@
             height: fit-content;
         }
 
+        /* ── Name ── */
         .name {
-            font-family: 'Special Gothic Expanded One', sans-serif;
-            font-size: 1.8rem;
-            color: var(--text-color);
+            font-family: var(--font-serif);
+            font-size: 1.45rem;
+            font-weight: 600;
+            color: var(--fg);
             margin-bottom: 1.5rem;
-            letter-spacing: 0.05em;
             margin-top: 4rem;
-            font-weight: normal;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
         }
 
+        /* ── Theme toggle ── */
         .theme-toggle {
             --theme-toggle-translateY: 0;
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            background-color: var(--button-bg);
-            border: 2px solid var(--text-color);
+            background-color: var(--bg1);
+            border: 1.5px solid var(--border);
             cursor: pointer;
             display: block;
             margin: 0 0 1.5rem auto;
             padding: 0;
             position: relative;
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            transition: border-color 0.2s, background-color 0.3s;
             overflow: hidden;
             transform: translateY(var(--theme-toggle-translateY));
         }
@@ -97,38 +107,216 @@
         .theme-toggle::before {
             content: '';
             position: absolute;
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
-            background-color: var(--button-text);
+            background-color: var(--fg4);
             top: 5px;
             left: 5px;
-            transition: transform 0.3s ease, background-color 0.3s ease;
+            transition: transform 0.3s ease, background-color 0.3s;
         }
 
         [data-theme="dark"] .theme-toggle::before {
-            transform: translateX(10px);
-            background-color: var(--link-hover-color);
+            transform: translateX(8px);
+            background-color: var(--bg1);
         }
 
-        .theme-toggle:hover {
-            transform: translateY(var(--theme-toggle-translateY)) scale(1.1);
-            border-color: var(--link-hover-color);
+        .theme-toggle:hover { border-color: var(--fg4); }
+        .theme-toggle:focus { outline: none; box-shadow: 0 0 0 2px var(--fg4); }
+
+        /* ── Social links ── */
+        .social-links { margin-top: 1rem; }
+
+        .social-links a {
+            font-family: var(--font-sans);
+            font-size: 0.82rem;
+            font-weight: 400;
+            color: var(--fg4);
+            text-decoration: none;
+            display: block;
+            margin-top: 0.45rem;
+            cursor: pointer;
+            transition: color 0.2s;
         }
 
-        .theme-toggle:hover::before {
-            background-color: #222;
+        .social-links a:hover,
+        .social-links a:visited:hover { color: var(--fg); }
+        .social-links a:visited { color: var(--fg4); }
+
+        /* ── Right column ── */
+        .right-column {
+            max-width: 600px;
+            margin-top: 4rem;
         }
 
-        [data-theme="dark"] .theme-toggle:hover::before {
-            background-color: #222;
+        .right-column p {
+            margin-bottom: 1rem;
+            color: var(--fg);
         }
 
-        .theme-toggle:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px var(--link-hover-color);
+        .right-column a {
+            color: var(--fg);
+            text-decoration: underline;
+            text-decoration-color: color-mix(in srgb, var(--fg) 20%, transparent);
+            transition: color 0.2s, text-decoration-color 0.2s;
         }
 
+        .right-column a:hover {
+            color: var(--fg2);
+            text-decoration-color: color-mix(in srgb, var(--fg2) 35%, transparent);
+        }
+
+        .right-column a:visited { color: var(--fg); }
+        .right-column a:visited:hover { color: var(--fg2); }
+
+        /* ── Research entries ── */
+        .right-column research-entry {
+            display: block;
+            margin-bottom: 2.25rem;
+        }
+
+        .right-column research-entry:last-of-type { margin-bottom: 0; }
+
+        .right-column research-entry p {
+            margin: 0.2rem 0;
+            line-height: 1.4;
+        }
+
+        /* ── Details / summary ── */
+        details { margin: 1rem 0; cursor: pointer; }
+
+        summary {
+            font-family: var(--font-sans);
+            font-size: 0.88rem;
+            list-style: none;
+            position: relative;
+            padding-left: 1.2rem;
+            cursor: pointer;
+            color: var(--fg4);
+            transition: color 0.2s;
+        }
+
+        summary::-webkit-details-marker { display: none; }
+
+        summary::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 0;
+            height: 0;
+            border-top: 0.3em solid transparent;
+            border-bottom: 0.3em solid transparent;
+            border-left: 0.4em solid currentColor;
+            transform: translateY(-50%);
+            transition: transform 0.2s;
+        }
+
+        details[open] summary::before { transform: translateY(-50%) rotate(90deg); }
+        summary:hover { color: var(--fg); }
+        details[open] summary { margin-bottom: 0.5rem; }
+        details p { font-size: 0.95rem; color: var(--fg2); }
+
+        /* ── Game controls ── */
+        .game-controls {
+            margin-top: 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 101;
+            pointer-events: auto;
+            margin-bottom: 80vh;
+        }
+
+        .game-controls button {
+            font-family: var(--font-sans);
+            font-size: 0.78rem;
+            font-weight: 400;
+            letter-spacing: 0.03em;
+            background-color: transparent;
+            color: var(--fg4);
+            border: 1px solid var(--border);
+            padding: 0.4rem 0.9rem;
+            margin: 0 0.3rem;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+
+        .game-controls button:hover {
+            background-color: var(--hover-bg);
+            color: var(--fg);
+            border-color: var(--fg4);
+        }
+
+        .game-controls button.active {
+            background-color: var(--bg1);
+            color: var(--fg);
+            border-color: var(--bg2);
+        }
+
+        [data-theme="dark"] .game-controls button.active {
+            background-color: var(--bg2);
+            color: var(--fg);
+        }
+
+        /* ── Canvas ── */
+        canvas#gameCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background-color: var(--bg);
+            transition: background-color 0.3s ease;
+        }
+
+        canvas#interactionCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 100;
+            background-color: transparent;
+            pointer-events: none;
+            cursor: default;
+        }
+
+        canvas#interactionCanvas.draw-mode {
+            pointer-events: auto;
+            cursor: crosshair;
+        }
+
+        /* ── Top nav ── */
+        .top-nav {
+            position: fixed;
+            top: 1.2rem;
+            right: 1.5rem;
+            display: flex;
+            gap: 1.2rem;
+            align-items: center;
+            font-family: var(--font-sans);
+            font-size: 0.82rem;
+            z-index: 200;
+        }
+
+        .top-nav a {
+            color: var(--fg4);
+            text-decoration: none;
+            transition: color 0.2s, opacity 0.4s ease;
+            will-change: opacity;
+        }
+
+        .top-nav a:hover { color: var(--fg); }
+
+        .top-nav span { color: var(--fg5); }
+
+        /* ── Author underline accent ── */
+        .author-underline {
+            text-decoration: underline;
+            text-decoration-color: color-mix(in srgb, var(--bg2) 60%, transparent);
+            text-underline-offset: 2px;
+            text-decoration-thickness: 1px;
+        }
+
+        /* ── Mobile ── */
         @media screen and (max-width: 768px) {
             .container {
                 grid-template-columns: 1fr;
@@ -145,7 +333,7 @@
             }
 
             .name {
-                font-size: 2.25rem;
+                font-size: 1.6rem;
                 margin-top: 2.5rem;
                 margin-bottom: 0.4rem;
             }
@@ -168,291 +356,49 @@
                 margin-bottom: 0.15rem;
             }
 
-            .social-links a {
-                display: inline-block;
-                margin: 0;
-            }
+            .social-links a { display: inline-block; margin: 0; }
 
             .right-column {
                 padding: 0 0.75rem;
                 margin-top: 0.1rem;
             }
 
-            .container.research-page .right-column {
-                margin-top: 0.1rem;
-            }
+            .container.research-page .right-column { margin-top: 0.1rem; }
 
             .game-controls {
                 display: flex;
                 flex-wrap: wrap;
                 justify-content: center;
-                gap: 0.65rem;
+                gap: 0.5rem;
             }
 
-            .game-controls button {
-                margin: 0;
-            }
+            .game-controls button { margin: 0; }
         }
 
         @media screen and (max-width: 480px) {
-            .container {
-                margin: 1rem auto;
-            }
-
-            .name {
-                font-size: 2rem;
-                margin-top: 2.5rem;
-                margin-bottom: 0.75rem;
-            }
-
-            .social-links {
-                gap: 0.45rem;
-            }
-
-            .social-links a {
-                font-size: 0.8rem;
-            }
-
-            .theme-toggle {
-                left: 1rem;
-            }
-
-            .right-column {
-                padding: 0 0.5rem;
-            }
-        }
-
-        canvas#gameCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background-color: var(--canvas-bg);
-            transition: background-color 0.3s ease;
-        }
-
-        canvas#interactionCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 100;
-            background-color: transparent;
-            pointer-events: none;
-            cursor: default;
-        }
-
-        canvas#interactionCanvas.draw-mode {
-            pointer-events: auto;
-            cursor: crosshair;
-        }
-
-        .game-controls {
-            margin-top: 2rem;
-            text-align: center;
-            position: relative;
-            z-index: 101;
-            pointer-events: auto;
-            margin-bottom: 80vh;
-        }
-
-        .game-controls button {
-            background-color: var(--button-bg);
-            color: var(--button-text);
-            border: none;
-            padding: 0.5rem 1rem;
-            margin: 0 0.5rem;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .game-controls button:hover {
-            background-color: var(--link-hover-color);
-            color: #222;
-        }
-
-        .game-controls button.active {
-            background-color: var(--active-button-bg);
-            color: #222;
-        }
-
-        .social-links {
-            margin-top: 1rem;
-        }
-
-        .social-links a {
-            color: var(--text-color);
-            text-decoration: none;
-            display: block;
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .social-links a:hover {
-            color: var(--link-hover-color);
-        }
-
-        .social-links a:visited {
-            color: var(--text-color);
-        }
-
-        .social-links a:visited:hover {
-            color: var(--link-hover-color);
-        }
-
-        .right-column {
-            max-width: 600px;
-            margin-top: 4rem;
+            .container { margin: 1rem auto; }
+            .name { font-size: 1.4rem; margin-top: 2.5rem; }
+            .social-links { gap: 0.45rem; }
+            .social-links a { font-size: 0.78rem; }
+            .theme-toggle { left: 1rem; }
+            .right-column { padding: 0 0.5rem; }
         }
 
         @media screen and (max-width: 768px) {
-            .right-column {
-                margin-top: 0.75rem;
-            }
-
-            .container.research-page .right-column {
-                margin-top: 0.75rem;
-            }
-        }
-
-        /* Details/Summary collapsible styling */
-        details {
-            margin: 1rem 0;
-            cursor: pointer;
-        }
-
-        summary {
-            list-style: none;
-            position: relative;
-            padding-left: 1.5rem;
-            cursor: pointer;
-            color: var(--text-color);
-            transition: color 0.2s ease;
-        }
-
-        summary::-webkit-details-marker {
-            display: none;
-        }
-
-        /* CSS triangle caret indicator rendered with borders to avoid emoji substitution */
-        summary::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            width: 0;
-            height: 0;
-            border-top: 0.3em solid transparent;
-            border-bottom: 0.3em solid transparent;
-            border-left: 0.45em solid currentColor;
-            transform: translateY(-50%);
-            transition: transform 0.2s ease;
-        }
-
-        details[open] summary::before {
-            transform: translateY(-50%) rotate(90deg);
-        }
-
-        summary:hover {
-            color: var(--link-hover-color);
-        }
-
-        details[open] summary {
-            margin-bottom: 0.5rem;
-        }
-
-        .author-underline {
-            text-decoration: underline;
-            text-decoration-color: rgba(255, 206, 107, 0.4);
-            text-underline-offset: 2px;
-            text-decoration-thickness: 0.5px;
-        }
-
-        .right-column p {
-            margin-bottom: 1rem;
-        }
-
-        .right-column research-entry {
-            display: block;
-            margin-bottom: 2.25rem;
-        }
-
-        .right-column research-entry:last-of-type {
-            margin-bottom: 0;
-        }
-
-        .right-column research-entry p {
-            margin: 0.2rem 0;
-            line-height: 1.3;
-        }
-
-        .right-column a {
-            color: var(--text-color);
-            text-decoration: underline;
-            transition: all 0.2s ease;
-        }
-
-        .right-column a:hover {
-            color: var(--link-hover-color);
-            text-decoration: underline;
-        }
-
-        .right-column a:visited {
-            color: var(--text-color);
-            text-decoration: underline;
-        }
-
-        .right-column a:visited:hover {
-            color: var(--link-hover-color);
-            text-decoration: underline;
-        }
-        /* Top navigation styles */
-        .top-nav {
-            position: fixed;
-            top: 1.2rem;
-            right: 1.5rem;
-            display: flex;
-            gap: 1.5rem;
-            font-family: 'Noto Sans', sans-serif;
-            z-index: 200;
-        }
-
-        .top-nav a {
-            color: var(--text-color);
-            text-decoration: none;
-            font-weight: 400;
-            transition: color 0.2s, opacity 0.4s ease;
-            will-change: opacity;
-        }
-
-        .top-nav a:hover {
-            color: var(--link-hover-color);
+            .right-column { margin-top: 0.75rem; }
+            .container.research-page .right-column { margin-top: 0.75rem; }
         }
     </style>
     <script>
         (function() {
-            var storageKey = 'theme';
             var root = document.documentElement;
-            function getStoredTheme() {
-                try { return localStorage.getItem(storageKey); } catch (e) { return null; }
+            function applyTheme(t) {
+                if (t === 'dark') root.setAttribute('data-theme','dark');
+                else root.removeAttribute('data-theme');
             }
-            function applyTheme(theme) {
-                if (theme === 'dark') {
-                    root.setAttribute('data-theme', 'dark');
-                } else {
-                    root.removeAttribute('data-theme');
-                }
-            }
-            var stored = getStoredTheme();
-            var prefersDark = false;
-            try { prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {}
-            applyTheme(stored || (prefersDark ? 'dark' : 'light'));
+            var stored; try { stored = localStorage.getItem('theme'); } catch(e) {}
+            var sys = false; try { sys = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch(e) {}
+            applyTheme(stored || (sys ? 'dark' : 'light'));
         })();
     </script>
 </head>
@@ -477,7 +423,7 @@
             if (!nav) return;
 
             var ticking = false;
-            var maxFadeDistance = 220; // px scrolled for full fade
+            var maxFadeDistance = 220;
 
             function updateOpacity() {
                 var y = window.scrollY || window.pageYOffset || 0;
@@ -494,48 +440,34 @@
                 }
             }, { passive: true });
 
-            // Initialize on load in case page opens mid-scroll
             updateOpacity();
         })();
     </script>
     <script>
         (function() {
-            var storageKey = 'theme';
             var root = document.documentElement;
-            function getStoredTheme() {
-                try { return localStorage.getItem(storageKey); } catch (e) { return null; }
+            function applyTheme(t) {
+                if (t === 'dark') root.setAttribute('data-theme','dark');
+                else root.removeAttribute('data-theme');
             }
-            function setStoredTheme(theme) {
-                try { localStorage.setItem(storageKey, theme); } catch (e) {}
-            }
-            function applyTheme(theme) {
-                if (theme === 'dark') {
-                    root.setAttribute('data-theme', 'dark');
-                } else {
-                    root.removeAttribute('data-theme');
-                }
-            }
+            function getStored() { try { return localStorage.getItem('theme'); } catch(e) { return null; } }
+            function setStored(t) { try { localStorage.setItem('theme', t); } catch(e) {} }
+
             var btn = document.getElementById('darkModeButton');
             if (btn) {
                 btn.addEventListener('click', function() {
-                    var isDark = root.getAttribute('data-theme') === 'dark';
-                    var next = isDark ? 'light' : 'dark';
-                    applyTheme(next);
-                    setStoredTheme(next);
+                    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                    applyTheme(next); setStored(next);
                 });
             }
-            var mql;
-            try { mql = window.matchMedia('(prefers-color-scheme: dark)'); } catch (e) { mql = null; }
+
+            var mql; try { mql = window.matchMedia('(prefers-color-scheme: dark)'); } catch(e) {}
             if (mql) {
-                var onChange = function(e) {
-                    if (!getStoredTheme()) {
-                        applyTheme(e.matches ? 'dark' : 'light');
-                    }
-                };
-                if (mql.addEventListener) mql.addEventListener('change', onChange);
-                else if (mql.addListener) mql.addListener(onChange);
+                var fn = function(e) { if (!getStored()) applyTheme(e.matches ? 'dark' : 'light'); };
+                if (mql.addEventListener) mql.addEventListener('change', fn);
+                else if (mql.addListener) mql.addListener(fn);
             }
         })();
     </script>
 </body>
-</html> 
+</html>
