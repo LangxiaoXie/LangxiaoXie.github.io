@@ -106,14 +106,9 @@
         .theme-btn:hover { border-color: var(--fg4); }
         .theme-btn:focus { outline: none; box-shadow: 0 0 0 2px var(--fg4); }
 
-        /* ── Page outer (vertical centering) ── */
+        /* ── Page outer: fixed top offset so all pages start at same height ── */
         .page-outer {
-            min-height: calc(100vh - 54px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 2rem 0 3rem;
-            box-sizing: border-box;
+            padding: calc(54px + max(3rem, 8vh)) 0 5rem;
         }
 
         /* ── Two-column grid ── */
@@ -290,7 +285,7 @@
 
         /* ── Mobile ── */
         @media (max-width: 680px) {
-            .page-outer { padding: 1.5rem 0 2rem; }
+            .page-outer { padding: calc(54px + 1.5rem) 0 3rem; }
 
             .page-grid {
                 grid-template-columns: 1fr;
