@@ -35,7 +35,7 @@
             --hover-bg:   rgba(235,219,178,0.06);
         }
 
-        html { overflow-y: scroll; scroll-padding-top: 4rem; }
+        html { overflow-y: scroll; }
 
         body {
             font-family: var(--font-serif);
@@ -71,12 +71,7 @@
             font-size: 0.85rem;
         }
 
-        .nav-left a {
-            color: var(--fg4);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
+        .nav-left a { color: var(--fg4); text-decoration: none; transition: color 0.2s; }
         .nav-left a:hover { color: var(--fg); }
         .nav-sep { color: var(--fg5); }
 
@@ -97,12 +92,10 @@
         .theme-btn::before {
             content: '';
             position: absolute;
-            width: 14px;
-            height: 14px;
+            width: 14px; height: 14px;
             border-radius: 50%;
             background-color: var(--fg4);
-            top: 5px;
-            left: 5px;
+            top: 5px; left: 5px;
             transition: transform 0.3s ease, background-color 0.3s;
         }
 
@@ -114,61 +107,70 @@
         .theme-btn:hover { border-color: var(--fg4); }
         .theme-btn:focus { outline: none; box-shadow: 0 0 0 2px var(--fg4); }
 
-        /* ── Page wrap ── */
-        .page-wrap {
-            max-width: calc(660px + 2 * 1.3rem);
+        /* ── Two-column grid ── */
+        .page-grid {
+            max-width: 920px;
             margin: 0 auto;
-            padding: 5rem 1.3rem 6rem;
+            padding: calc(54px + 2.5rem) 2rem 6rem;
+            display: grid;
+            grid-template-columns: 190px 1fr;
+            column-gap: 4rem;
+            align-items: start;
             position: relative;
             z-index: 1;
         }
 
-        .page-wrap h1 {
-            font-family: var(--font-serif);
-            font-size: clamp(1.7rem, 4vw, 2.4rem);
-            font-weight: 600;
-            line-height: 1.15;
-            color: var(--fg);
-            margin: 0 0 1rem;
-            letter-spacing: -0.01em;
+        /* ── Left column ── */
+        .left-col {
+            position: sticky;
+            top: calc(54px + 1.5rem);
+            height: fit-content;
+            text-align: right;
         }
 
-        /* ── Meta line (social links) ── */
+        .page-title {
+            font-family: var(--font-serif);
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--fg);
+            margin: 0 0 1.2rem;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+        }
+
         .page-meta {
             font-family: var(--font-sans);
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             color: var(--fg4);
             display: flex;
-            gap: 1.4rem;
-            flex-wrap: wrap;
-            margin-bottom: 2.5rem;
+            flex-direction: column;
+            gap: 0.45rem;
         }
 
-        .page-meta a {
-            color: var(--fg4);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
+        .page-meta a { color: var(--fg4); text-decoration: none; transition: color 0.2s; }
         .page-meta a:hover { color: var(--fg); }
+        .page-meta a:visited { color: var(--fg4); }
+        .page-meta a:visited:hover { color: var(--fg); }
 
-        /* ── Body text ── */
-        .page-wrap p { margin: 0 0 1em; color: var(--fg); }
+        /* ── Right column ── */
+        .right-col { max-width: 560px; }
 
-        .page-wrap a {
+        .right-col p { margin: 0 0 1em; color: var(--fg); }
+
+        .right-col a {
             color: var(--fg);
             text-decoration: underline;
             text-decoration-color: color-mix(in srgb, var(--fg) 20%, transparent);
             transition: color 0.2s, text-decoration-color 0.2s;
         }
 
-        .page-wrap a:hover {
+        .right-col a:hover {
             color: var(--fg2);
             text-decoration-color: color-mix(in srgb, var(--fg2) 35%, transparent);
         }
 
-        .page-wrap a:visited { color: var(--fg); }
-        .page-wrap a:visited:hover { color: var(--fg2); }
+        .right-col a:visited { color: var(--fg); }
+        .right-col a:visited:hover { color: var(--fg2); }
 
         /* ── Details ── */
         details { margin: 1rem 0; }
@@ -189,8 +191,7 @@
         summary::before {
             content: '';
             position: absolute;
-            left: 0;
-            top: 50%;
+            left: 0; top: 50%;
             width: 0; height: 0;
             border-top: 0.3em solid transparent;
             border-bottom: 0.3em solid transparent;
@@ -207,13 +208,12 @@
         /* ── Entries (projects & essays listing) ── */
         .entries {
             border-top: 1px solid var(--border);
-            padding-top: 2rem;
-            margin-top: 0.5rem;
+            padding-top: 1.75rem;
         }
 
         .entry {
-            margin-bottom: 2.2rem;
-            padding-bottom: 2.2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
             border-bottom: 1px solid var(--border);
         }
 
@@ -234,14 +234,9 @@
 
         .entry-title a:hover { opacity: 0.65; }
 
-        .entry-sub {
-            color: var(--fg4);
-            font-style: italic;
-            font-weight: 400;
-        }
+        .entry-sub { color: var(--fg4); font-style: italic; font-weight: 400; }
 
         .entry-desc {
-            font-family: var(--font-serif);
             font-size: 0.93rem;
             color: var(--fg4);
             margin: 0.2rem 0 0;
@@ -283,9 +278,7 @@
             border-color: var(--bg2);
         }
 
-        [data-theme="dark"] .game-controls button.active {
-            background-color: var(--bg2);
-        }
+        [data-theme="dark"] .game-controls button.active { background-color: var(--bg2); }
 
         /* ── Canvas ── */
         canvas#gameCanvas {
@@ -307,17 +300,28 @@
             cursor: default;
         }
 
-        canvas#interactionCanvas.draw-mode {
-            pointer-events: auto;
-            cursor: crosshair;
-        }
+        canvas#interactionCanvas.draw-mode { pointer-events: auto; cursor: crosshair; }
 
         /* ── Mobile ── */
-        @media (max-width: 600px) {
-            .site-nav { padding: 0 1rem; }
-            .page-wrap { padding: 4.5rem 1rem 4rem; }
-            .page-wrap h1 { font-size: 1.6rem; }
-            .page-meta { gap: 1rem; }
+        @media (max-width: 680px) {
+            .page-grid {
+                grid-template-columns: 1fr;
+                padding: calc(54px + 1.5rem) 1.2rem 4rem;
+                row-gap: 0.5rem;
+            }
+
+            .left-col {
+                position: static;
+                text-align: left;
+                display: flex;
+                align-items: baseline;
+                gap: 1.5rem;
+                flex-wrap: wrap;
+            }
+
+            .page-title { margin-bottom: 0; }
+
+            .page-meta { flex-direction: row; flex-wrap: wrap; gap: 0.8rem; }
         }
     </style>
     <script>
