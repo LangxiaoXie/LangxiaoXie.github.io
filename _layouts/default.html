@@ -4,108 +4,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
-    <title>{{ site.title }}</title>
+    <title>{% if page.title %}{{ page.title }} — {% endif %}{{ site.title }}</title>
     <link rel="icon" type="image/svg+xml" href="{{ site.baseurl }}/favicon.svg">
     <link rel="alternate icon" type="image/x-icon" href="{{ site.baseurl }}/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        /* ── Gruvbox-inspired palette (matches ThinkingMachines) ── */
         :root {
-            --bg:            white;
-            --fg:            #282828;
-            --fg2:           #504945;
-            --fg4:           #676767;
-            --fg5:           #969696;
-            --bg1:           #ebdbb2;
-            --bg2:           #d5c4a1;
-            --border:        color-mix(in srgb, #282828 12%, transparent);
-            --hover-bg:      rgba(128,128,128,0.08);
-            --canvas-cell:   #d5c4a1;
-            --font-sans:     'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            --font-serif:    'Source Serif 4', 'Iowan Old Style BT', Georgia, serif;
+            --bg:         white;
+            --fg:         #282828;
+            --fg2:        #504945;
+            --fg4:        #676767;
+            --fg5:        #969696;
+            --bg1:        #ebdbb2;
+            --bg2:        #d5c4a1;
+            --border:     color-mix(in srgb, #282828 12%, transparent);
+            --hover-bg:   rgba(128,128,128,0.08);
+            --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-serif: 'Source Serif 4', 'Iowan Old Style BT', Georgia, serif;
         }
 
         [data-theme="dark"] {
-            --bg:            #282828;
-            --fg:            #ebdbb2;
-            --fg2:           #d5c4a1;
-            --fg4:           #a89984;
-            --fg5:           #7c6f64;
-            --bg1:           #3c3836;
-            --bg2:           #504945;
-            --border:        color-mix(in srgb, #ebdbb2 12%, transparent);
-            --hover-bg:      rgba(235,219,178,0.06);
-            --canvas-cell:   #3c3836;
+            --bg:         #282828;
+            --fg:         #ebdbb2;
+            --fg2:        #d5c4a1;
+            --fg4:        #a89984;
+            --fg5:        #7c6f64;
+            --bg1:        #3c3836;
+            --bg2:        #504945;
+            --border:     color-mix(in srgb, #ebdbb2 12%, transparent);
+            --hover-bg:   rgba(235,219,178,0.06);
         }
 
-        html { overflow-y: scroll; }
+        html { overflow-y: scroll; scroll-padding-top: 4rem; }
 
         body {
             font-family: var(--font-serif);
             font-size: 17px;
             line-height: 1.6;
+            background-color: var(--bg);
+            color: var(--fg);
             margin: 0;
             padding: 0;
-            background-color: var(--bg);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            color: var(--fg);
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* ── Layout ── */
-        .container {
-            max-width: 900px;
-            margin: 5rem auto;
-            padding: 2rem;
-            display: grid;
-            grid-template-columns: 220px 1fr;
-            gap: 3rem;
-            flex: 1;
-            position: relative;
-            z-index: 1;
-            align-items: start;
+        /* ── Nav ── */
+        .site-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            background-color: var(--bg);
+            border-bottom: 1px solid var(--border);
+            z-index: 200;
+            transition: background-color 0.3s ease;
         }
 
-        .left-column {
-            text-align: right;
-            position: sticky;
-            top: 2rem;
-            height: fit-content;
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
         }
 
-        /* ── Name ── */
-        .name {
-            font-family: var(--font-serif);
-            font-size: 1.45rem;
-            font-weight: 600;
-            color: var(--fg);
-            margin-bottom: 1.5rem;
-            margin-top: 4rem;
-            letter-spacing: -0.01em;
-            line-height: 1.2;
+        .nav-left a {
+            color: var(--fg4);
+            text-decoration: none;
+            transition: color 0.2s;
         }
 
-        /* ── Theme toggle ── */
-        .theme-toggle {
-            --theme-toggle-translateY: 0;
+        .nav-left a:hover { color: var(--fg); }
+        .nav-sep { color: var(--fg5); }
+
+        .theme-btn {
             width: 28px;
             height: 28px;
             border-radius: 50%;
             background-color: var(--bg1);
             border: 1.5px solid var(--border);
             cursor: pointer;
-            display: block;
-            margin: 0 0 1.5rem auto;
+            flex-shrink: 0;
             padding: 0;
             position: relative;
-            transition: border-color 0.2s, background-color 0.3s;
             overflow: hidden;
-            transform: translateY(var(--theme-toggle-translateY));
+            transition: border-color 0.2s, background-color 0.3s;
         }
 
-        .theme-toggle::before {
+        .theme-btn::before {
             content: '';
             position: absolute;
             width: 14px;
@@ -117,74 +106,72 @@
             transition: transform 0.3s ease, background-color 0.3s;
         }
 
-        [data-theme="dark"] .theme-toggle::before {
+        [data-theme="dark"] .theme-btn::before {
             transform: translateX(8px);
             background-color: var(--bg1);
         }
 
-        .theme-toggle:hover { border-color: var(--fg4); }
-        .theme-toggle:focus { outline: none; box-shadow: 0 0 0 2px var(--fg4); }
+        .theme-btn:hover { border-color: var(--fg4); }
+        .theme-btn:focus { outline: none; box-shadow: 0 0 0 2px var(--fg4); }
 
-        /* ── Social links ── */
-        .social-links { margin-top: 1rem; }
+        /* ── Page wrap ── */
+        .page-wrap {
+            max-width: calc(660px + 2 * 1.3rem);
+            margin: 0 auto;
+            padding: 5rem 1.3rem 6rem;
+            position: relative;
+            z-index: 1;
+        }
 
-        .social-links a {
+        .page-wrap h1 {
+            font-family: var(--font-serif);
+            font-size: clamp(1.7rem, 4vw, 2.4rem);
+            font-weight: 600;
+            line-height: 1.15;
+            color: var(--fg);
+            margin: 0 0 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        /* ── Meta line (social links) ── */
+        .page-meta {
             font-family: var(--font-sans);
             font-size: 0.82rem;
-            font-weight: 400;
+            color: var(--fg4);
+            display: flex;
+            gap: 1.4rem;
+            flex-wrap: wrap;
+            margin-bottom: 2.5rem;
+        }
+
+        .page-meta a {
             color: var(--fg4);
             text-decoration: none;
-            display: block;
-            margin-top: 0.45rem;
-            cursor: pointer;
             transition: color 0.2s;
         }
 
-        .social-links a:hover,
-        .social-links a:visited:hover { color: var(--fg); }
-        .social-links a:visited { color: var(--fg4); }
+        .page-meta a:hover { color: var(--fg); }
 
-        /* ── Right column ── */
-        .right-column {
-            max-width: 600px;
-            margin-top: 4rem;
-        }
+        /* ── Body text ── */
+        .page-wrap p { margin: 0 0 1em; color: var(--fg); }
 
-        .right-column p {
-            margin-bottom: 1rem;
-            color: var(--fg);
-        }
-
-        .right-column a {
+        .page-wrap a {
             color: var(--fg);
             text-decoration: underline;
             text-decoration-color: color-mix(in srgb, var(--fg) 20%, transparent);
             transition: color 0.2s, text-decoration-color 0.2s;
         }
 
-        .right-column a:hover {
+        .page-wrap a:hover {
             color: var(--fg2);
             text-decoration-color: color-mix(in srgb, var(--fg2) 35%, transparent);
         }
 
-        .right-column a:visited { color: var(--fg); }
-        .right-column a:visited:hover { color: var(--fg2); }
+        .page-wrap a:visited { color: var(--fg); }
+        .page-wrap a:visited:hover { color: var(--fg2); }
 
-        /* ── Research entries ── */
-        .right-column research-entry {
-            display: block;
-            margin-bottom: 2.25rem;
-        }
-
-        .right-column research-entry:last-of-type { margin-bottom: 0; }
-
-        .right-column research-entry p {
-            margin: 0.2rem 0;
-            line-height: 1.4;
-        }
-
-        /* ── Details / summary ── */
-        details { margin: 1rem 0; cursor: pointer; }
+        /* ── Details ── */
+        details { margin: 1rem 0; }
 
         summary {
             font-family: var(--font-sans);
@@ -204,8 +191,7 @@
             position: absolute;
             left: 0;
             top: 50%;
-            width: 0;
-            height: 0;
+            width: 0; height: 0;
             border-top: 0.3em solid transparent;
             border-bottom: 0.3em solid transparent;
             border-left: 0.4em solid currentColor;
@@ -218,14 +204,57 @@
         details[open] summary { margin-bottom: 0.5rem; }
         details p { font-size: 0.95rem; color: var(--fg2); }
 
+        /* ── Entries (projects & essays listing) ── */
+        .entries {
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .entry {
+            margin-bottom: 2.2rem;
+            padding-bottom: 2.2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .entry:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+        .entry-title {
+            margin: 0 0 0.3rem;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .entry-title a {
+            text-decoration: none !important;
+            font-weight: 500;
+            color: var(--fg);
+            transition: opacity 0.2s;
+        }
+
+        .entry-title a:hover { opacity: 0.65; }
+
+        .entry-sub {
+            color: var(--fg4);
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .entry-desc {
+            font-family: var(--font-serif);
+            font-size: 0.93rem;
+            color: var(--fg4);
+            margin: 0.2rem 0 0;
+        }
+
         /* ── Game controls ── */
         .game-controls {
-            margin-top: 2rem;
-            text-align: center;
+            margin-top: 2.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
             position: relative;
-            z-index: 101;
-            pointer-events: auto;
-            margin-bottom: 80vh;
+            z-index: 201;
         }
 
         .game-controls button {
@@ -237,7 +266,6 @@
             color: var(--fg4);
             border: 1px solid var(--border);
             padding: 0.4rem 0.9rem;
-            margin: 0 0.3rem;
             border-radius: 3px;
             cursor: pointer;
             transition: background-color 0.2s, color 0.2s, border-color 0.2s;
@@ -257,7 +285,6 @@
 
         [data-theme="dark"] .game-controls button.active {
             background-color: var(--bg2);
-            color: var(--fg);
         }
 
         /* ── Canvas ── */
@@ -285,109 +312,12 @@
             cursor: crosshair;
         }
 
-        /* ── Top nav ── */
-        .top-nav {
-            position: fixed;
-            top: 1.2rem;
-            right: 1.5rem;
-            display: flex;
-            gap: 1.2rem;
-            align-items: center;
-            font-family: var(--font-sans);
-            font-size: 0.82rem;
-            z-index: 200;
-        }
-
-        .top-nav a {
-            color: var(--fg4);
-            text-decoration: none;
-            transition: color 0.2s, opacity 0.4s ease;
-            will-change: opacity;
-        }
-
-        .top-nav a:hover { color: var(--fg); }
-
-        .top-nav span { color: var(--fg5); }
-
-        /* ── Author underline accent ── */
-        .author-underline {
-            text-decoration: underline;
-            text-decoration-color: color-mix(in srgb, var(--bg2) 60%, transparent);
-            text-underline-offset: 2px;
-            text-decoration-thickness: 1px;
-        }
-
         /* ── Mobile ── */
-        @media screen and (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-                margin: 2rem auto;
-                padding: 1rem;
-                row-gap: 0.25rem;
-            }
-
-            .left-column {
-                text-align: center;
-                position: static;
-                padding: 0;
-                margin-bottom: 0.1rem;
-            }
-
-            .name {
-                font-size: 1.6rem;
-                margin-top: 2.5rem;
-                margin-bottom: 0.4rem;
-            }
-
-            .theme-toggle {
-                position: fixed;
-                top: calc(1.2rem + 0.8rem);
-                left: 1.5rem;
-                margin: 0;
-                z-index: 250;
-                --theme-toggle-translateY: -50%;
-            }
-
-            .social-links {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 0.6rem;
-                margin-top: 0.3rem;
-                margin-bottom: 0.15rem;
-            }
-
-            .social-links a { display: inline-block; margin: 0; }
-
-            .right-column {
-                padding: 0 0.75rem;
-                margin-top: 0.1rem;
-            }
-
-            .container.research-page .right-column { margin-top: 0.1rem; }
-
-            .game-controls {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 0.5rem;
-            }
-
-            .game-controls button { margin: 0; }
-        }
-
-        @media screen and (max-width: 480px) {
-            .container { margin: 1rem auto; }
-            .name { font-size: 1.4rem; margin-top: 2.5rem; }
-            .social-links { gap: 0.45rem; }
-            .social-links a { font-size: 0.78rem; }
-            .theme-toggle { left: 1rem; }
-            .right-column { padding: 0 0.5rem; }
-        }
-
-        @media screen and (max-width: 768px) {
-            .right-column { margin-top: 0.75rem; }
-            .container.research-page .right-column { margin-top: 0.75rem; }
+        @media (max-width: 600px) {
+            .site-nav { padding: 0 1rem; }
+            .page-wrap { padding: 4.5rem 1rem 4rem; }
+            .page-wrap h1 { font-size: 1.6rem; }
+            .page-meta { gap: 1rem; }
         }
     </style>
     <script>
@@ -404,46 +334,19 @@
     </script>
 </head>
 <body>
-    <nav class="top-nav">
-        <a href="{{ site.baseurl }}/">Luc Xie</a>
-        <span>/</span>
-        <a href="{{ site.baseurl }}/projects/">Projects</a>
-        <span>/</span>
-        <a href="{{ site.baseurl }}/essays/">Essays</a>
-    </nav>
+    <header class="site-nav">
+        <div class="nav-left">
+            <a href="{{ site.baseurl }}/">Luc Xie</a>
+            <span class="nav-sep">/</span>
+            <a href="{{ site.baseurl }}/projects/">Projects</a>
+            <span class="nav-sep">/</span>
+            <a href="{{ site.baseurl }}/essays/">Essays</a>
+        </div>
+        <button id="themeBtn" class="theme-btn" aria-label="Toggle theme"></button>
+    </header>
+
     {{ content }}
 
-    <script>
-        (function() {
-            var base = "{{ site.baseurl }}";
-            var path = window.location.pathname;
-            var isHome = (base ? path === base + "/" : path === "/");
-            if (!isHome) return;
-
-            var nav = document.querySelector('.top-nav');
-            if (!nav) return;
-
-            var ticking = false;
-            var maxFadeDistance = 220;
-
-            function updateOpacity() {
-                var y = window.scrollY || window.pageYOffset || 0;
-                var opacity = 1 - Math.min(1, y / maxFadeDistance);
-                nav.style.opacity = String(opacity);
-                nav.style.pointerEvents = opacity < 0.1 ? 'none' : '';
-                ticking = false;
-            }
-
-            window.addEventListener('scroll', function() {
-                if (!ticking) {
-                    window.requestAnimationFrame(updateOpacity);
-                    ticking = true;
-                }
-            }, { passive: true });
-
-            updateOpacity();
-        })();
-    </script>
     <script>
         (function() {
             var root = document.documentElement;
@@ -453,15 +356,13 @@
             }
             function getStored() { try { return localStorage.getItem('theme'); } catch(e) { return null; } }
             function setStored(t) { try { localStorage.setItem('theme', t); } catch(e) {} }
-
-            var btn = document.getElementById('darkModeButton');
+            var btn = document.getElementById('themeBtn');
             if (btn) {
                 btn.addEventListener('click', function() {
                     var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
                     applyTheme(next); setStored(next);
                 });
             }
-
             var mql; try { mql = window.matchMedia('(prefers-color-scheme: dark)'); } catch(e) {}
             if (mql) {
                 var fn = function(e) { if (!getStored()) applyTheme(e.matches ? 'dark' : 'light'); };

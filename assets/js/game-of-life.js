@@ -49,7 +49,7 @@ function initialize() {
     startButton.addEventListener('click', toggleGame);
     drawButton.addEventListener('click',  toggleDrawMode);
     clearButton.addEventListener('click', clearAll);
-    document.getElementById('darkModeButton')?.addEventListener('click', () => setTimeout(drawFrame, 50));
+    document.getElementById('themeBtn')?.addEventListener('click', () => setTimeout(drawFrame, 50));
 
     interactionCanvas.addEventListener('mousedown',  onDown);
     interactionCanvas.addEventListener('mousemove',  onMove);
