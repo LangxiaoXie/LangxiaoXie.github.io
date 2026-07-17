@@ -4,7 +4,6 @@ title: Essays
 permalink: /essays/
 ---
 
-<div class="page-outer">
 <div class="page-grid">
     <div class="left-col">
         <h1 class="page-title">Essays</h1>
@@ -50,5 +49,4 @@ permalink: /essays/
             </div>
         </div>
     </div>
-</div>
 </div>

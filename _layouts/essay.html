@@ -106,21 +106,15 @@
         .theme-btn:hover { border-color: var(--fg4); }
         .theme-btn:focus { outline: none; box-shadow: 0 0 0 2px var(--fg4); }
 
-        /* ── Page outer: fixed top offset so all pages start at same height ── */
-        .page-outer {
-            padding: calc(54px + max(3rem, 8vh)) 0 5rem;
-        }
-
         /* ── Two-column grid ── */
         .page-grid {
             max-width: 920px;
-            margin: 0 auto;
+            margin: calc(54px + 3.5rem) auto 5rem;
             padding: 0 2rem;
             display: grid;
             grid-template-columns: 190px 1fr;
             column-gap: 4rem;
             align-items: start;
-            width: 100%;
             box-sizing: border-box;
         }
 
@@ -285,10 +279,9 @@
 
         /* ── Mobile ── */
         @media (max-width: 680px) {
-            .page-outer { padding: calc(54px + 1.5rem) 0 3rem; }
-
             .page-grid {
                 grid-template-columns: 1fr;
+                margin-top: calc(54px + 1.5rem);
                 padding: 0 1.2rem;
                 row-gap: 0.5rem;
             }
