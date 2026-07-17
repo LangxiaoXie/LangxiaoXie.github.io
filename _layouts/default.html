@@ -107,17 +107,29 @@
         .theme-btn:hover { border-color: var(--fg4); }
         .theme-btn:focus { outline: none; box-shadow: 0 0 0 2px var(--fg4); }
 
+        /* ── Vertical centering wrapper ── */
+        .page-outer {
+            min-height: calc(100vh - 54px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2rem 0 3rem;
+            box-sizing: border-box;
+        }
+
         /* ── Two-column grid ── */
         .page-grid {
             max-width: 920px;
             margin: 0 auto;
-            padding: calc(54px + 2.5rem) 2rem 6rem;
+            padding: 0 2rem;
             display: grid;
             grid-template-columns: 190px 1fr;
             column-gap: 4rem;
             align-items: start;
             position: relative;
             z-index: 1;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         /* ── Left column ── */
@@ -212,8 +224,8 @@
         }
 
         .entry {
-            margin-bottom: 2rem;
-            padding-bottom: 2rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1.25rem;
             border-bottom: 1px solid var(--border);
         }
 
@@ -304,9 +316,11 @@
 
         /* ── Mobile ── */
         @media (max-width: 680px) {
+            .page-outer { padding: 1.5rem 0 2rem; }
+
             .page-grid {
                 grid-template-columns: 1fr;
-                padding: calc(54px + 1.5rem) 1.2rem 4rem;
+                padding: 0 1.2rem;
                 row-gap: 0.5rem;
             }
 

@@ -7,43 +7,35 @@
     <title>{{ page.title }} — {{ site.title }}</title>
     <link rel="icon" type="image/svg+xml" href="{{ site.baseurl }}/favicon.svg">
     <link rel="alternate icon" type="image/x-icon" href="{{ site.baseurl }}/favicon.ico">
-    <!-- Source Serif 4: closest Google Fonts match to Iowan Old Style BT -->
-    <!-- Inter: closest free match to GT America -->
     <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        /* ── Gruvbox-inspired palette (matches ThinkingMachines exactly) ── */
         :root {
-            --bg:   white;
-            --fg:   #282828;
-            --fg2:  #504945;
-            --fg4:  #676767;
-            --fg5:  #969696;
-            --bg1:  #ebdbb2;
-            --bg2:  #d5c4a1;
-            --border: color-mix(in srgb, #282828 12%, transparent);
+            --bg:         white;
+            --fg:         #282828;
+            --fg2:        #504945;
+            --fg4:        #676767;
+            --fg5:        #969696;
+            --bg1:        #ebdbb2;
+            --bg2:        #d5c4a1;
+            --border:     color-mix(in srgb, #282828 12%, transparent);
             --link-underline: color-mix(in srgb, #282828 20%, transparent);
-            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             --font-serif: 'Source Serif 4', 'Iowan Old Style BT', Georgia, serif;
-            --content-max: 660px;
-            --content-pad: 1.3rem;
         }
 
         [data-theme="dark"] {
-            --bg:   #282828;
-            --fg:   #ebdbb2;
-            --fg2:  #d5c4a1;
-            --fg4:  #a89984;
-            --fg5:  #7c6f64;
-            --bg1:  #3c3836;
-            --bg2:  #504945;
-            --border: color-mix(in srgb, #ebdbb2 15%, transparent);
+            --bg:         #282828;
+            --fg:         #ebdbb2;
+            --fg2:        #d5c4a1;
+            --fg4:        #a89984;
+            --fg5:        #7c6f64;
+            --bg1:        #3c3836;
+            --bg2:        #504945;
+            --border:     color-mix(in srgb, #ebdbb2 12%, transparent);
             --link-underline: color-mix(in srgb, #ebdbb2 25%, transparent);
         }
 
-        html {
-            overflow-y: scroll;
-            scroll-padding-top: 4rem;
-        }
+        html { overflow-y: scroll; scroll-padding-top: 4rem; }
 
         body {
             font-family: var(--font-serif);
@@ -56,12 +48,10 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* ── Site header (matches default layout nav) ── */
+        /* ── Nav ── */
         .site-nav {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             height: 54px;
             display: flex;
             align-items: center;
@@ -81,19 +71,12 @@
             font-size: 0.85rem;
         }
 
-        .nav-left a {
-            color: var(--fg4);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
+        .nav-left a { color: var(--fg4); text-decoration: none; transition: color 0.2s; }
         .nav-left a:hover { color: var(--fg); }
-
         .nav-sep { color: var(--fg5); }
 
         .theme-btn {
-            width: 28px;
-            height: 28px;
+            width: 28px; height: 28px;
             border-radius: 50%;
             background-color: var(--bg1);
             border: 1.5px solid var(--border);
@@ -108,12 +91,10 @@
         .theme-btn::before {
             content: '';
             position: absolute;
-            width: 14px;
-            height: 14px;
+            width: 14px; height: 14px;
             border-radius: 50%;
             background-color: var(--fg4);
-            top: 5px;
-            left: 5px;
+            top: 5px; left: 5px;
             transition: transform 0.3s ease, background-color 0.3s;
         }
 
@@ -123,22 +104,72 @@
         }
 
         .theme-btn:hover { border-color: var(--fg4); }
+        .theme-btn:focus { outline: none; box-shadow: 0 0 0 2px var(--fg4); }
 
-        /* ── Page body ── */
-        .essay-wrap {
-            max-width: calc(var(--content-max) + 2 * var(--content-pad));
-            margin: 0 auto;
-            padding: 5rem var(--content-pad) 6rem;
+        /* ── Page outer (vertical centering) ── */
+        .page-outer {
+            min-height: calc(100vh - 54px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2rem 0 3rem;
+            box-sizing: border-box;
         }
 
-        /* ── Header ── */
+        /* ── Two-column grid ── */
+        .page-grid {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 190px 1fr;
+            column-gap: 4rem;
+            align-items: start;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* ── Left column ── */
+        .left-col {
+            position: sticky;
+            top: calc(54px + 1.5rem);
+            height: fit-content;
+            text-align: right;
+        }
+
+        .page-title {
+            font-family: var(--font-serif);
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--fg);
+            margin: 0 0 1.2rem;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+        }
+
+        .page-meta {
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            color: var(--fg4);
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .page-meta a { color: var(--fg4); text-decoration: none; transition: color 0.2s; }
+        .page-meta a:hover { color: var(--fg); }
+        .page-meta a:visited { color: var(--fg4); }
+
+        /* ── Right column (essay content) ── */
+        .right-col { min-width: 0; }
+
         .essay-back {
             display: inline-block;
             font-family: var(--font-sans);
             font-size: 0.8rem;
             color: var(--fg4);
             text-decoration: none;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
             transition: color 0.2s;
         }
 
@@ -154,9 +185,9 @@
             display: block;
         }
 
-        .essay-wrap h1 {
+        .right-col h1 {
             font-family: var(--font-serif);
-            font-size: clamp(1.7rem, 4vw, 2.4rem);
+            font-size: clamp(1.5rem, 3.5vw, 2.1rem);
             font-weight: 600;
             line-height: 1.15;
             color: var(--fg);
@@ -166,22 +197,19 @@
 
         .essay-subtitle {
             font-family: var(--font-serif);
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-style: italic;
             color: var(--fg4);
-            margin: 0 0 2.5rem;
+            margin: 0 0 2rem;
         }
 
-        /* ── Article ── */
+        /* ── Article content ── */
         .content {
             border-top: 1px solid var(--border);
-            padding-top: 2rem;
+            padding-top: 1.75rem;
         }
 
-        .content p {
-            margin: 0 0 1.25em;
-            color: var(--fg);
-        }
+        .content p { margin: 0 0 1.25em; color: var(--fg); }
 
         .content p.dropcap::first-letter {
             font-size: 3.3em;
@@ -205,7 +233,7 @@
         .content blockquote {
             border-left: 2px solid color-mix(in srgb, var(--fg4) 35%, var(--bg) 65%);
             color: var(--fg2);
-            margin: 1.6rem 0 1.6rem 0;
+            margin: 1.6rem 0;
             padding: 0.1rem 0 0.1rem 1.25rem;
         }
 
@@ -245,7 +273,7 @@
 
         /* ── Footer ── */
         .essay-footer {
-            margin-top: 3rem;
+            margin-top: 2.5rem;
             padding-top: 1.25rem;
             border-top: 1px solid var(--border);
             font-family: var(--font-sans);
@@ -260,9 +288,29 @@
 
         .essay-footer a:hover { color: var(--fg); }
 
-        @media (max-width: 600px) {
-            .essay-wrap { padding-top: 4.5rem; }
-            .essay-wrap h1 { font-size: 1.6rem; }
+        /* ── Mobile ── */
+        @media (max-width: 680px) {
+            .page-outer { padding: 1.5rem 0 2rem; }
+
+            .page-grid {
+                grid-template-columns: 1fr;
+                padding: 0 1.2rem;
+                row-gap: 0.5rem;
+            }
+
+            .left-col {
+                position: static;
+                text-align: left;
+                display: flex;
+                align-items: baseline;
+                gap: 1.5rem;
+                flex-wrap: wrap;
+            }
+
+            .page-title { margin-bottom: 0; }
+            .page-meta { flex-direction: row; flex-wrap: wrap; gap: 0.8rem; }
+
+            .right-col h1 { font-size: 1.5rem; }
         }
     </style>
     <script>
@@ -290,19 +338,28 @@
         <button id="themeBtn" class="theme-btn" aria-label="Toggle theme"></button>
     </header>
 
-    <div class="essay-wrap">
-        <a href="{{ site.baseurl }}/essays/" class="essay-back">← Essays</a>
-
-        <span class="essay-kicker">Essay</span>
-        <h1>{{ page.title }}</h1>
-        {% if page.subtitle %}<p class="essay-subtitle">{{ page.subtitle }}</p>{% endif %}
-
-        <div class="content">
-            {{ content }}
-        </div>
-
-        <div class="essay-footer">
-            <a href="{{ site.baseurl }}/essays/">← Back to essays</a>
+    <div class="page-outer">
+        <div class="page-grid">
+            <div class="left-col">
+                <h1 class="page-title">Luc Xie</h1>
+                <div class="page-meta">
+                    <span>langxiao [dot] xie [at] berkeley [dot] edu</span>
+                    <a href="https://linkedin.com/in/lucas-x-019b67174">LinkedIn</a>
+                    <a href="https://github.com/LangxiaoXie">GitHub</a>
+                </div>
+            </div>
+            <div class="right-col">
+                <a href="{{ site.baseurl }}/essays/" class="essay-back">← Essays</a>
+                <span class="essay-kicker">Essay</span>
+                <h1>{{ page.title }}</h1>
+                {% if page.subtitle %}<p class="essay-subtitle">{{ page.subtitle }}</p>{% endif %}
+                <div class="content">
+                    {{ content }}
+                </div>
+                <div class="essay-footer">
+                    <a href="{{ site.baseurl }}/essays/">← Back to essays</a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -310,7 +367,7 @@
         (function() {
             var root = document.documentElement;
             function applyTheme(t) {
-                if (t==='dark') root.setAttribute('data-theme','dark');
+                if (t === 'dark') root.setAttribute('data-theme','dark');
                 else root.removeAttribute('data-theme');
             }
             function getStored() { try { return localStorage.getItem('theme'); } catch(e) { return null; } }

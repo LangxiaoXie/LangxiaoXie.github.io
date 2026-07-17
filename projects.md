@@ -4,6 +4,7 @@ title: Projects
 permalink: /projects/
 ---
 
+<div class="page-outer">
 <div class="page-grid">
     <div class="left-col">
         <h1 class="page-title">Projects</h1>
@@ -25,4 +26,5 @@ permalink: /projects/
             </div>
         </div>
     </div>
+</div>
 </div>

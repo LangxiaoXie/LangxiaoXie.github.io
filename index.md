@@ -2,6 +2,7 @@
 layout: default
 ---
 
+<div class="page-outer">
 <div class="page-grid">
     <div class="left-col">
         <h1 class="page-title">Luc Xie</h1>
@@ -26,6 +27,7 @@ layout: default
             <button id="clearButton">Clear</button>
         </div>
     </div>
+</div>
 </div>
 
 <canvas id="gameCanvas"></canvas>
