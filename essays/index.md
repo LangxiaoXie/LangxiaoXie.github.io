@@ -72,5 +72,37 @@ permalink: /essays/
             <p class="essay-title"><a href="/essays/spinoza-practical-philosophies.html">Spinoza: Practical Philosophies?</a> <span class="essay-sub">— On the Third Kind of Knowledge and Ethics</span></p>
             <p>On Spinoza's closing propositions in the <em>Ethics</em> and what it means for the mind to exist <em>sub specie aeternitatis</em>.</p>
         </research-entry>
+        <research-entry>
+            <p class="essay-title"><a href="/essays/art-of-resistance.html">Art of Resistance</a></p>
+            <p>Rancière, Foucault, and the politics of sensibility — on the rhetoric of dissensus and the Zero-COVID protests.</p>
+        </research-entry>
+        <research-entry>
+            <p class="essay-title"><a href="/essays/indexicality-and-contingency.html">Indexicality and Contingency</a></p>
+            <p>On the Many-Worlds interpretation of quantum mechanics and the case for a non-global determinism.</p>
+        </research-entry>
+        <research-entry>
+            <p class="essay-title"><a href="/essays/ontology-as-immanent-thinking.html">Ontology as Immanent Thinking</a></p>
+            <p>Deleuze's transcendental empiricism situated against Longuenesse's reading of Kant's three syntheses of time.</p>
+        </research-entry>
+        <research-entry>
+            <p class="essay-title"><a href="/essays/potentiality-positive-and-negative.html">Potentiality, Positive and Negative</a></p>
+            <p>Agamben's concept of potentiality between Aristotle and Heidegger, and the structure of the possible.</p>
+        </research-entry>
+        <research-entry>
+            <p class="essay-title"><a href="/essays/sophie-as-metaphor.html">Sophie as Metaphor</a></p>
+            <p>Derrida's <em>De la grammatologie</em> and the figure of Sophie in Rousseau's <em>Émile</em> — supplement, inscription, and the constitution of the subject.</p>
+        </research-entry>
+        <research-entry>
+            <p class="essay-title"><a href="/essays/stories-overtold-again.html">Stories Overtold Again</a></p>
+            <p>Historical materialism and the dialectic of theory and action — Nietzsche, Foucault, Benjamin, and Rancière on the time after history.</p>
+        </research-entry>
+        <research-entry>
+            <p class="essay-title"><a href="/essays/margin-of-philosophy.html">The Margin of Philosophy</a></p>
+            <p>Hegel, Tocqueville, and civil society read through cybernetics — on the eschatological limits of social theory.</p>
+        </research-entry>
+        <research-entry>
+            <p class="essay-title"><a href="/essays/deleuzian-count-to-four.html">What Must a Deleuzian Learn to Count to Four?</a></p>
+            <p>The four syntheses of <em>Anti-Oedipus</em> and the question of structure, genesis, and the body without organs.</p>
+        </research-entry>
     </div>
 </div>
