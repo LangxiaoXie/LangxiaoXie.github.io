@@ -13,7 +13,6 @@ layout: default
     </div>
     <div class="right-col">
         <p>Hi there! I'm Luc. As of spring 2026, I conduct research on poverty, energy, and AI safety. Outside of my research, I read great books, milk cows, and hire interesting professors at Deep Springs College.</p>
-        <p>I am interested in the intellectual and material dynamics of modernity, especially as they pertain to core–periphery relations, existential risk, and the project of Enlightenment.</p>
         <details>
             <summary>More</summary>
             <p>Outside of work, I'm interested in intellectual history, mathematical physics, language acquisition, and the backcountry.</p>
