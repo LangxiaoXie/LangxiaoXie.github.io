@@ -97,8 +97,8 @@ permalink: /essays/
             <p>Historical materialism and the dialectic of theory and action — Nietzsche, Foucault, Benjamin, and Rancière on the time after history.</p>
         </research-entry>
         <research-entry>
-            <p class="essay-title"><a href="/essays/margin-of-philosophy.html">The Margin of Philosophy</a></p>
-            <p>Hegel, Tocqueville, and civil society read through cybernetics — on the eschatological limits of social theory.</p>
+            <p class="essay-title"><a href="/essays/spectres-of-heidegger.html">Spectres of Heidegger</a> <span class="essay-sub">— Eschatology and the Dusk of Haunting</span></p>
+            <p>Heidegger's history of Being read against Derrida's hauntology — on eschatology, repetition, and the spectre that refuses to depart.</p>
         </research-entry>
         <research-entry>
             <p class="essay-title"><a href="/essays/deleuzian-count-to-four.html">What Must a Deleuzian Learn to Count to Four?</a></p>
