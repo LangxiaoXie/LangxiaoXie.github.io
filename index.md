@@ -12,7 +12,7 @@ layout: default
         </div>
     </div>
     <div class="right-col">
-        <p>Hi there! I'm Luc. As of spring 2026, I conduct research on Global Capitalism and its past and future. I am also a software engineer at <a href="https://www.bricnbrac.com/">Bric&amp;Brac</a>. Outside of my work, I read great books, milk cows, and hire interesting professors at Deep Springs College.</p>
+        <p>Hi there! I'm Luc. As of spring 2026, I conduct research on Global Capitalism and its past and future. I am also a software engineer at <a href="https://www.bricnbrac.com/">Bric&amp;Brac</a>. In my free time, I read great books, milk cows, and hire interesting professors at Deep Springs College.</p>
         <details>
             <summary>More</summary>
             <p>Outside of work, I'm interested in intellectual history, mathematical physics, language acquisition, and the backcountry.</p>
