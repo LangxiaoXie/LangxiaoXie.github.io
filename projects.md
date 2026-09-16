@@ -16,8 +16,8 @@ permalink: /projects/
     <div class="right-col">
         <div class="entries">
             <div class="entry">
-                <p class="entry-title"><a href="https://www.bricnbrac.com/">Atelier Map</a></p>
-                <p class="entry-desc">A living map of a product, built out of the work coding agents do on it. An agent can touch dozens of files and report back in a single sentence, which leaves the person who owns the product steadily less able to say what it contains; Atelier Map reconstructs what exists, what changed in a session, and what changed because of the last request. In its first iteration at Bric&amp;Brac; source is private.</p>
+                <p class="entry-title">Atelier</p>
+                <p class="entry-desc">A living map of a product, built out of the work coding agents do on it. An agent can touch dozens of files and report back in a single sentence, which leaves the person who owns the product steadily less able to say what it contains; Atelier reconstructs what exists, what changed in a session, and what changed because of the last request. In its first iteration at Bric&amp;Brac; source is private.</p>
             </div>
             <div class="entry">
                 <p class="entry-title"><a href="https://www.bricnbrac.com/">Purl</a></p>
@@ -36,7 +36,7 @@ permalink: /projects/
                 <p class="entry-desc">A collection of evals for Inspect AI. PaperBench's blacklist monitor stops an agent fetching the paper's reference implementation, but it matched only clone URLs that put host and path either side of a slash, so scp-like SSH syntax, where a colon separates the two, went undetected. My patch normalises that form before the check runs.</p>
             </div>
             <div class="entry">
-                <p class="entry-title">Sparse Autoencoder Playground</p>
+                <p class="entry-title"><a href="https://github.com/LangxiaoXie/sae-playground">Sparse Autoencoder Playground</a></p>
                 <p class="entry-desc">A sparse autoencoder written to be read in one sitting. It is trained first on synthetic data whose features are known, so that recovery can actually be checked, and then pointed at GPT-2 activations. Ships with a terminal walkthrough that draws its plots as coloured blocks, so the whole thing runs without a browser.</p>
             </div>
             <div class="entry">
